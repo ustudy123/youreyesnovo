@@ -11,10 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { fromTable } from "@/integrations/supabase/untypedClient";
+import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/hooks/useTenant";
 import { useEmpresaAtiva } from "@/contexts/EmpresaAtivaContext";
 import { useColaboradores } from "@/hooks/useColaboradores";
-import { Coffee, Plus, Edit, Trash2, AlertTriangle } from "lucide-react";
+import { Coffee, Plus, Edit, Trash2, AlertTriangle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { confirm as confirmDialog } from "@/components/ui/confirm-dialog";
@@ -69,6 +70,18 @@ export function PontoPreAssinalacaoTab() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<PreAssinalacaoForm>(defaultForm);
   const [saving, setSaving] = useState(false);
+
+  // Reprocessamento da competência. A declaração vale a partir da vigência,
+  // mas ela é aplicada quando o DIA é consolidado — quem cadastra depois do
+  // mês corrido precisa mandar os dias já apurados serem reconsiderados.
+  // As duas telas sempre avisaram disso; faltava o meio de fazer.
+  const [reprocOpen, setReprocOpen] = useState(false);
+  const [reprocComp, setReprocComp] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1); // o caso comum é regularizar o mês que fechou
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
+  const [reprocessando, setReprocessando] = useState(false);
 
   const { data: declaracoes = [], isLoading } = useQuery({
     queryKey: ["ponto-pre-assinalacao", tenantId, empresaAtivaId],
@@ -200,6 +213,36 @@ export function PontoPreAssinalacaoTab() {
     toast.success("Declaração removida");
   };
 
+  const onReprocessar = async () => {
+    if (!tenantId) return;
+    setReprocessando(true);
+    try {
+      const { data, error } = await supabase.rpc("ponto_reprocessar_pre_assinalacao" as any, {
+        p_tenant_id: tenantId,
+        p_competencia: reprocComp,
+        p_empresa_id: empresaAtivaId || null,
+      });
+      if (error) throw error;
+      const r = data as any;
+      if (r?.error) { toast.error(r.error); return; }
+      if (r?.dias_reprocessados === 0) {
+        toast.info(r?.aviso || "Nada a reprocessar nesta competência.");
+      } else {
+        toast.success(
+          `${r.dias_reprocessados} dia(s) reconsiderado(s); ${r.dias_pre_assinalados} com intervalo pré-assinalado` +
+          (r.alertas_removidos ? `; ${r.alertas_removidos} alerta(s) de intervalo suprimido retirado(s)` : "") + "."
+        );
+      }
+      setReprocOpen(false);
+      qc.invalidateQueries({ queryKey: ["ponto-diario"] });
+      qc.invalidateQueries({ queryKey: ["ponto-alertas"] });
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao reprocessar");
+    } finally {
+      setReprocessando(false);
+    }
+  };
+
   const janela = (d: any) =>
     d.intervalo_inicio && d.intervalo_fim
       ? `${String(d.intervalo_inicio).slice(0, 5)} — ${String(d.intervalo_fim).slice(0, 5)}`
@@ -220,7 +263,12 @@ export function PontoPreAssinalacaoTab() {
             que foi declarado.
           </p>
         </div>
-        <Button onClick={onNovo} className="shrink-0"><Plus className="w-4 h-4 mr-2" /> Nova declaração</Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button variant="outline" onClick={() => setReprocOpen(true)}>
+            <RefreshCw className="w-4 h-4 mr-2" /> Reprocessar competência
+          </Button>
+          <Button onClick={onNovo}><Plus className="w-4 h-4 mr-2" /> Nova declaração</Button>
+        </div>
       </div>
 
       <Card>
@@ -394,6 +442,47 @@ export function PontoPreAssinalacaoTab() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
             <Button onClick={onSalvar} disabled={saving}>{saving ? "Salvando..." : "Salvar"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={reprocOpen} onOpenChange={setReprocOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Reprocessar competência</DialogTitle>
+            <DialogDescription>
+              Aplica as declarações vigentes aos dias que já foram apurados. Use depois de
+              cadastrar uma pré-assinalação com vigência retroativa — sem isto, o mês que já
+              passou continua mostrando o intervalo como suprimido.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>Competência</Label>
+              <Input type="month" value={reprocComp} onChange={(e) => setReprocComp(e.target.value)} />
+            </div>
+
+            <div className="flex gap-2 p-3 rounded-lg border bg-muted/30 text-xs text-muted-foreground">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p>
+                  Só mexe no intervalo: horas trabalhadas, horas extras, batidas e situação do dia
+                  ficam exatamente como estão.
+                </p>
+                <p>
+                  Uma batida real de almoço continua vencendo o que foi declarado, e a competência
+                  já fechada não é alterada — reabra antes, se for o caso.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReprocOpen(false)}>Cancelar</Button>
+            <Button onClick={onReprocessar} disabled={reprocessando || !reprocComp}>
+              {reprocessando ? "Reprocessando..." : "Reprocessar"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
