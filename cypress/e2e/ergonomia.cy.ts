@@ -4,9 +4,15 @@
 // Gestão de Risco Ergonômico (/ergonomia) — testes de tela (nível e2e).
 //
 // Cada it() corresponde a um caso documentado (ERGO-*), ligado pela ponte
-// qa_cobertura_e2e. Escopo: a entrada do módulo — as 7 abas do fluxo GRO
-// montam, o Guia Rápido abre e fecha, e a trava de risco sem título segura
-// o cadastro. NADA aqui cria risco, então não depende de dado semeado.
+// qa_cobertura_e2e. Escopo: a entrada do módulo — o Guia Rápido abre e fecha
+// e a trava de risco sem título segura o cadastro. NADA aqui cria risco,
+// então não depende de dado semeado.
+//
+// ERGO-001 (as 7 abas do fluxo GRO) fica FORA deste lote de propósito: a
+// página só renderiza as abas quando o módulo tem inventário NR-17 (senão
+// mostra o EmptyState com botão de inicializar). Testar as abas exigiria
+// inicializar o módulo (escrever a base NR-17 na ilha), o que sai do escopo
+// "sem semear dado". Fica documentado e pendente até um teste com dado.
 // =====================================================================
 
 import { credenciaisDeTeste } from "../support/credenciais";
@@ -30,19 +36,6 @@ describe("Gestão de Risco Ergonômico (/ergonomia)", () => {
     login();
     cy.visit(`${baseUrl}/ergonomia`);
     cy.contains("h1", "Gestão de Risco Ergonômico", { timeout: 20000 }).should("be.visible");
-  });
-
-  // ERGO-001
-  it("abre com as 7 abas do fluxo GRO", () => {
-    [
-      "Avaliar Riscos (AEP)",
-      "Inventário GRO",
-      "Riscos Prioritários",
-      "Plano de Ação",
-      "Monitoramento",
-      "Análise por IA",
-      "Base Ergonômica",
-    ].forEach((t) => cy.contains('[role="tab"]', t).should("exist"));
   });
 
   // ERGO-002
