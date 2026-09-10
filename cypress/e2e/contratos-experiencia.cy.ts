@@ -57,8 +57,17 @@ describe("Contratos de Experiência (/contratos-experiencia)", () => {
   it("bloqueia a configuração de períodos que excede 90 dias", () => {
     cy.contains('[role="tab"]', "Configuração da Empresa").click({ force: true });
     cy.contains("label", "Duração do 1º período", { timeout: 20000 }).should("be.visible");
-    cy.contains("label", "Duração do 1º período").parent().find('input[type="number"]').clear().type("95");
-    cy.contains("excede 90").should("be.visible");
+    // O campo é um input numérico controlado do React: digitar tecla a tecla
+    // re-renderiza e solta o elemento do DOM. Setamos o valor com UM evento
+    // 'input' (padrão confiável), pelo realm do próprio app (ownerDocument).
+    cy.contains("label", "Duração do 1º período").parent().find('input[type="number"]').then(($i) => {
+      const input = $i[0] as HTMLInputElement;
+      const win = input.ownerDocument.defaultView as (Window & typeof globalThis);
+      const setter = Object.getOwnPropertyDescriptor(win.HTMLInputElement.prototype, "value")!.set!;
+      setter.call(input, "95");
+      input.dispatchEvent(new win.Event("input", { bubbles: true }));
+    });
+    cy.contains("excede 90", { timeout: 20000 }).should("be.visible");
     cy.contains("button", "Salvar Configuração").should("be.disabled");
   });
 });
