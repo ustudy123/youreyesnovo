@@ -195,7 +195,17 @@ const FAQ = [
 // ---------------- Component ----------------
 export default function Site() {
   const [ciclo, setCiclo] = useState<Ciclo>("semestral");
-  useEffect(() => { capturarRefDaUrl(); }, []);
+  // Indicação de parceiro: guarda o código e mostra quem indicou
+  const [indicador, setIndicador] = useState<{ nome: string; cidade: string | null; uf: string | null } | null>(null);
+  const [faixaFechada, setFaixaFechada] = useState(false);
+  useEffect(() => {
+    const ref = capturarRefDaUrl();
+    if (!ref) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).rpc("parceiro_ref_publico", { p_codigo: ref }).then(({ data }: { data: { nome: string; cidade: string | null; uf: string | null } | null }) => { if (data?.nome) setIndicador(data); });
+    // Link "contratar" (#planos): rola até os planos depois que a página monta
+    if (window.location.hash === "#planos") setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 400);
+  }, []);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loadingPlano, setLoadingPlano] = useState<string | null>(null);
 
@@ -279,6 +289,17 @@ export default function Site() {
     <div className="min-h-screen bg-[#0B1D34] text-slate-100">
 
       {/* NAV */}
+      {indicador && !faixaFechada && (
+        <div className="bg-[#FF8A00] text-[#0B1D34] text-sm" data-testid="faixa-indicacao">
+          <div className="max-w-7xl mx-auto px-6 py-2 flex flex-wrap items-center justify-between gap-2">
+            <span>🤝 Você foi indicado(a) por <b>{indicador.nome}</b>{indicador.cidade ? ` (${indicador.cidade}${indicador.uf ? `/${indicador.uf}` : ""})` : ""}, parceiro(a) YourEyes. Sua indicação já está registrada.</span>
+            <span className="flex items-center gap-3">
+              <a href="#planos" className="font-semibold underline underline-offset-2">Ver planos</a>
+              <button type="button" aria-label="Fechar" className="opacity-70 hover:opacity-100" onClick={() => setFaixaFechada(true)}>✕</button>
+            </span>
+          </div>
+        </div>
+      )}
       <header className="sticky top-0 z-40 bg-[#0B1D34]/85 backdrop-blur border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="#topo" className="flex items-center gap-3">

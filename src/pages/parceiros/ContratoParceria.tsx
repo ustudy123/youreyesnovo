@@ -29,7 +29,8 @@ export default function ContratoParceria() {
     })();
   }, []);
 
-  const pendente = !!(user && parceiroId && dados?.contrato?.pendente);
+  const aguardando = !!(user && parceiroId && dados?.contrato?.aguardando_aprovacao);
+  const pendente = !!(user && parceiroId && dados?.contrato?.pendente) && !aguardando;
   const assinar = async () => {
     setIniciando(true);
     try {
@@ -59,6 +60,7 @@ export default function ContratoParceria() {
                   A cópia assinada fica guardada pela YourEyes e disponível para você.
                 </p>
               </div>
+              {aguardando && <span className="inline-flex items-center gap-1.5 text-sm text-amber-300 max-w-xs"><ShieldCheck className="w-4 h-4 shrink-0" />A assinatura é liberada depois que a equipe YourEyes aprovar o seu cadastro.</span>}
               {pendente && (
                 <Button className="bg-[#FF8A00] hover:bg-[#e67a00] text-white" disabled={iniciando} onClick={assinar} data-testid="contrato-assinar">
                   {iniciando ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileSignature className="w-4 h-4 mr-2" />}Assinar eletronicamente

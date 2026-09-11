@@ -296,6 +296,18 @@ serve(async (req) => {
     return json({ ok: true, tenantId: existingProfile.tenant_id }, 200);
   }
 
+  // Porta livre de cadastro de empresa (sem plano/pagamento): obedece a chave
+  // app_config.cadastro_empresa_livre ('nao' por padrão). Chamadas com a
+  // chave de serviço (rotinas da casa, checkout) passam sempre.
+  const chamadaDeServico = jwt === SUPABASE_SERVICE_ROLE_KEY;
+  if (!chamadaDeServico) {
+    const { data: cfg } = await admin.from("app_config").select("valor").eq("chave", "cadastro_empresa_livre").maybeSingle();
+    const livre = ["sim", "true", "1"].includes(String(cfg?.valor ?? "nao").trim().toLowerCase());
+    if (!livre) {
+      return json({ error: "O cadastro de empresa é feito pela contratação de um plano. Escolha um plano no site para criar a sua conta.", code: "cadastro_livre_fechado" }, 403);
+    }
+  }
+
   // Ensure tenant slug is unique — auto-append suffix if taken
   let finalSlug = tenantSlug;
   let slugAttempt = 0;

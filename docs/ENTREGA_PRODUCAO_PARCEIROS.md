@@ -28,6 +28,7 @@ teste. Nada aqui é automático: a produção só muda pelos dois gestos manuais
 | 6 | `docs/script_parceiros_onda4.sql` | Captura por link `?ref=`, atribuição automática, porta Meta Ads em standby | `OK — Onda 4 aplicada (Meta Ads em standby)` |
 | 7 | `docs/script_youreyes_dados_fiscais.sql` | Cadastro único dos dados fiscais da YourEyes usados nos contratos | `OK — dados fiscais da YourEyes prontos` |
 | 8 | `docs/script_parceiros_contrato_assinatura.sql` | Contrato em padrão ABNT com as duas partes e assinatura eletrônica completa | `OK` com `qa_pgp_016 = passou` |
+| 9 | `docs/script_parceiros_aprovacao_portas.sql` | Aprovação em duas travas (contrato só após aprovar), faixa de indicação no site, porta livre de cadastro fechada (chave para reabrir) | `OK` com `qa_pgp_017 = passou` e `porta_livre_aberta = f` |
 
 Prova realizada em 04/09/2026: os oito scripts foram executados nessa ordem
 numa réplica local reconstruída até o estado atual da produção (migrations
@@ -66,6 +67,19 @@ SELECT (SELECT count(*) FROM public.parceiro_programa_config)            AS para
 Esperado: `parametros = 43`, `niveis = 9`, `contrato_vigente = 2`,
 `modelo_parceria = 1`, `cron_fechamento = 1`; `dados_fiscais_preenchidos`
 passa a `true` depois do passo 2.
+
+## Entrega 2 (11/09/2026) — o que muda para quem já rodou os 8 scripts
+
+Rodar só o script 9 e publicar no Lovable de novo. Efeitos:
+- Representante e Operador: o painel vira "Cadastro em análise" até a aprovação;
+  ao aprovar em SuperAdmin › Parceiros, o contrato é gerado e o parceiro recebe
+  e-mail para assinar; o link só aparece depois da assinatura. Indicador segue
+  automático (aprovado na hora → assina → link).
+- Site: quem chega por `?ref=` vê a faixa "Você foi indicado por X"; o painel do
+  parceiro oferece dois links (apresentação e contratar).
+- "Cadastre sua empresa" (tela de login) deixa de criar empresa sem plano: leva
+  aos planos. Para reabrir (ou preparar o teste grátis): SuperAdmin › Dados da
+  YourEyes › Portas de entrada.
 
 ## Pendências que continuam do lado da casa
 
