@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import {
   useFeriasMediaVariaveis, descreverMedia, type MediaVariaveis,
 } from "@/hooks/useFeriasMediaVariaveis";
+import { FeriasEsocialEventos } from "@/components/ferias/FeriasEsocialEventos";
 
 const fmtMoeda = (v: number) => (v || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
 
@@ -352,6 +353,11 @@ export function FeriasTab() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Eventos do eSocial desta concessão (RF-008) */}
+              <div className="border-t pt-3">
+                <FeriasEsocialEventos calculoId={showDetalhe.id} />
+              </div>
             </div>
           )}
         </DialogContent>
