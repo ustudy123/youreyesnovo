@@ -17,7 +17,7 @@ export function ParceirosLayout({ children, titulo }: { children: React.ReactNod
     <div className="min-h-screen bg-[#0B1D34] text-slate-100">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-[#0B1D34]/95 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/parceiros" className="flex items-center gap-3">
             <img src={logoLocal} alt="YourEyes" className="h-9 w-auto" />
             <div className="leading-tight">
               <div className="font-bold text-white">YourEyes</div>
