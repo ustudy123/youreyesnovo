@@ -102,7 +102,7 @@ const SEARCH_KEYWORDS: Record<string, string[]> = {
   "/cadastros/departamentos": ["departamento", "setor", "area"],
   "/cadastros/cargos": ["cargo", "cbo"],
   "/cadastros/filiais": ["filial", "obra", "estabelecimento", "unidade"],
-  "/marketplace": ["marketplace", "parceiro", "profissional", "rede", "rede de parceiros"],
+  "/marketplace": ["marketye", "marketplace", "especialista", "profissional", "servicos", "rede de parceiros"],
   "/terceiros": ["terceiro", "terceirizado", "prestador"],
   "/documentos": ["documento", "arquivo", "pasta", "upload"],
   "/financeiro": ["financeiro", "guia", "pagamento", "certidao"],

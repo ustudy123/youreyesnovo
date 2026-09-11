@@ -29,7 +29,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 // `destino`/`variante`: a Área do Parceiro reaproveita este formulário em
 // /parceiros/entrar, só trocando texto e para onde ir depois de entrar.
-export default function Login({ destino, variante }: { destino?: string; variante?: "parceiro" } = {}) {
+export default function Login({ destino, variante }: { destino?: string; variante?: "parceiro" | "especialista" } = {}) {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn, loading } = useAuthContext();
@@ -68,9 +68,9 @@ export default function Login({ destino, variante }: { destino?: string; variant
       </div>
 
       <div className="text-center space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">{variante === "parceiro" ? "Área do Parceiro" : "Login"}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{variante === "parceiro" ? "Área do Parceiro" : variante === "especialista" ? "MarketYE · Portal do especialista" : "Login"}</h1>
         <p className="text-sm text-muted-foreground">
-          {variante === "parceiro" ? "Entre com a conta do seu cadastro de parceiro" : "Entre com suas credenciais para acessar"}
+          {variante === "parceiro" ? "Entre com a conta do seu cadastro de parceiro" : variante === "especialista" ? "Entre com a conta do seu cadastro de especialista" : "Entre com suas credenciais para acessar"}
         </p>
       </div>
 

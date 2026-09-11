@@ -13,7 +13,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-  const { user, profile, loading, hasMinimumRole, signOut, isSuperAdmin, parceiroId } = useAuthContext();
+  const { user, profile, loading, hasMinimumRole, signOut, isSuperAdmin, parceiroId, especialistaId } = useAuthContext();
   const location = useLocation();
   const { isBloqueado, isLoading: loadingStatus } = useUsuarioStatus(user?.id, profile?.tenant_id);
   const { temAcessoModulo, temAcessoModuloAdmin, perfilVinculado, isLoading: loadingPerfil, isOwner } = usePerfilPermissions();
@@ -43,6 +43,12 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
   // fora do sistema (planejamento do Programa de Parceiros, seção 2.4).
   if (!profile && !isSuperAdmin && parceiroId) {
     return <Navigate to="/parceiro" replace />;
+  }
+
+  // Especialista do MarketYE sem perfil de empresa: a casa dele é o portal do
+  // especialista, fora do sistema (entidade global, sem tenant).
+  if (!profile && !isSuperAdmin && especialistaId) {
+    return <Navigate to="/marketye/portal" replace />;
   }
 
   // Logged in, but missing tenant/profile linkage (não é superadmin)
