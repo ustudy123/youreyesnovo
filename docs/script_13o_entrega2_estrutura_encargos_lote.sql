@@ -973,6 +973,26 @@ SELECT e.item,
        THEN NULL ELSE 'Objeto nao encontrado apos a execucao' END AS erro_tecnico
   FROM esperado e
  UNION ALL
+-- Este script recria decimo_terceiro_calcular na versao SEM a politica do
+-- adiantamento (que vem no script seguinte). Reaplicar este script
+-- sozinho, depois da entrega completa, faria a politica escolhida pela
+-- empresa deixar de valer em silencio. A linha abaixo avisa quando isso
+-- acontecer: a correcao e reaplicar o script do adiantamento na sequencia.
+SELECT 'a politica do adiantamento continua valendo',
+       CASE WHEN NOT EXISTS (SELECT 1 FROM information_schema.columns
+                              WHERE table_schema='public' AND table_name='decimo_terceiro_config'
+                                AND column_name='adiantamento_base') THEN 'OK'
+            WHEN position('adiantamento_base' in p.prosrc) > 0 THEN 'OK'
+            ELSE 'RESOLVER' END,
+       CASE WHEN NOT EXISTS (SELECT 1 FROM information_schema.columns
+                              WHERE table_schema='public' AND table_name='decimo_terceiro_config'
+                                AND column_name='adiantamento_base') THEN NULL
+            WHEN position('adiantamento_base' in p.prosrc) > 0 THEN NULL
+            ELSE 'este script devolveu o calculo a versao anterior a politica do adiantamento — '
+                 || 'rode em seguida o script_13o_adiantamento_e_media_sumula347.sql' END
+  FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+ WHERE n.nspname='public' AND p.proname='decimo_terceiro_calcular'
+ UNION ALL
 SELECT 'sonda de QA DEC13-070 ajustada a trava de pagamento',
        CASE WHEN position('data_pagamento' in p.prosrc) > 0 THEN 'OK' ELSE 'FALTOU' END,
        CASE WHEN position('data_pagamento' in p.prosrc) > 0 THEN NULL

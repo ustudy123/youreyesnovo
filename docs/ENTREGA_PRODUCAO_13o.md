@@ -24,6 +24,7 @@ do projeto de produção (`diayjpsrcerycycyaxst`).
 | 4 | `docs/script_13o_entrega3_alertas_prazos.sql` | Alertas de prazo (D-30/15/7 e D-15/7/3) e geração de Plano de Ação |
 | 5 | `docs/script_13o_entrega4_provisao_rescisao_ferias.sql` | Provisão contábil, conciliação, 13º na rescisão e adiantamento nas férias |
 | 6 | `docs/script_13o_entrega5_esocial.sql` | S-1200 anual (indApuracao = 2) e S-1210, com validação prévia. **Não transmite** |
+| 7 | `docs/script_13o_testes_leva2_e_correcoes.sql` | 14 casos de teste novos (com base legal) e duas correções de lei na apuração: projeção do aviso prévio indenizado e acidente do trabalho |
 
 ## O que esperar em cada conferência
 
@@ -35,9 +36,20 @@ do projeto de produção (`diayjpsrcerycycyaxst`).
 | 4 | 9 | todas **OK**, inclusive o agendamento diário. Onde não há `pg_cron`, essa linha sai **INFORMATIVO** e a varredura funciona pelo botão da tela |
 | 5 | 8 | todas **OK** |
 | 6 | 6 | todas **OK** |
+| 7 | 17 | todas **OK**; a última linha informa o total de casos documentados (31) |
 
 Qualquer linha **FALTOU** significa que aquele item não foi criado — pare e
 mande a tabela inteira antes de seguir.
+
+## A ordem importa, mesmo sendo tudo idempotente
+
+Rodar de novo não duplica nada, mas os scripts se sobrepõem: o script 2 recria
+o cálculo da parcela na versão **anterior** à política do adiantamento, que vem
+no script 3. Reaplicar o 2 sozinho, depois de tudo pronto, faria a política
+escolhida pela empresa deixar de valer — em silêncio. Por isso: **ao reaplicar
+qualquer script, reaplique também os seguintes**. O script 2 avisa sozinho
+quando isso acontece (linha "a política do adiantamento continua valendo" com
+situação `RESOLVER`).
 
 ## O que é alterado em dado existente
 
