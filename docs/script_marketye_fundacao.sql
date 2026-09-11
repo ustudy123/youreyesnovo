@@ -9,7 +9,7 @@
 -- Cole no SQL Editor do projeto. Roda em UMA transação; pode ser executado
 -- mais de uma vez (colunas IF NOT EXISTS, políticas recriadas, funções
 -- CREATE OR REPLACE, seeds com ON CONFLICT). É o mesmo conteúdo das
--- migrations 20260911170000, 20260911171000 e 20260911172000 (a de
+-- migrations 20260911210000, 20260911211000 e 20260911212000 (a de
 -- mobiliário da ilha de teste NÃO entra: é dado fictício do ambiente de teste).
 --
 -- O QUE MUDA EM DADO EXISTENTE (sem apagar nada): serviços ativos ganham
@@ -2170,14 +2170,20 @@ BEGIN
   r.passo_ordem := 3; r.passo_acao := 'INSERT direto como usuário autenticado com status ativo e selo'; r.esperado := 'guarda rebaixa para pendente/sem selo';
   v_claims := current_setting('request.jwt.claims', true);
   PERFORM public.qa_mky_claims(v_uid2);
+  -- A trava do cercado (qa_guarda_cercado) lê public.tenants com o papel de
+  -- quem escreve; como 'authenticated' ela não enxerga o cercado (RLS) e
+  -- bloquearia este INSERT mesmo com tenant_id do cercado. O modo de teste
+  -- fica desligado só neste statement: a linha é do cercado e a bateria
+  -- descarta a transação inteira de qualquer jeito.
+  PERFORM set_config('app.qa_modo', 'off', true);
   SET LOCAL ROLE authenticated;
   BEGIN
     INSERT INTO public.marketplace_profissionais (user_id, tenant_id, nome_completo, email, status, selo_verificado, nota_media)
     VALUES (v_uid2, v_cercado, 'QA Especialista Direto', 'qa-mky-direto-' || left(v_uid2::text, 8) || '@sandbox.invalid', 'ativo', true, 5) RETURNING id INTO v_id2;
   EXCEPTION WHEN OTHERS THEN
-    RESET ROLE; PERFORM set_config('request.jwt.claims', COALESCE(v_claims, ''), true); RAISE;
+    RESET ROLE; PERFORM set_config('app.qa_modo', 'on', true); PERFORM set_config('request.jwt.claims', COALESCE(v_claims, ''), true); RAISE;
   END;
-  RESET ROLE; PERFORM set_config('request.jwt.claims', COALESCE(v_claims, ''), true);
+  RESET ROLE; PERFORM set_config('app.qa_modo', 'on', true); PERFORM set_config('request.jwt.claims', COALESCE(v_claims, ''), true);
   SELECT status::text, selo_verificado INTO v_status, v_selo FROM public.marketplace_profissionais WHERE id = v_id2;
   IF v_status = 'pendente' AND NOT v_selo THEN
     r.situacao := 'passou'; r.obtido := 'Função e INSERT direto nascem pendentes e sem selo; CPF repetido recusado; consentimentos registrados.';
@@ -2622,12 +2628,13 @@ BEGIN
   SELECT * INTO e FROM public.qa_mky_especialista('013', '900.000.011-47');
   r.passo_ordem := 1; r.passo_acao := 'UPDATE direto de status pelo próprio especialista (papel authenticated)'; r.esperado := 'recusado pela guarda';
   PERFORM public.qa_mky_claims(e.uid);
+  PERFORM set_config('app.qa_modo', 'off', true);  -- ver MKY-001: a trava do cercado não enxerga o cercado como authenticated
   SET LOCAL ROLE authenticated;
   BEGIN
     UPDATE public.marketplace_profissionais SET status = 'ativo', selo_verificado = true WHERE id = e.prof_id;
     v_msg := 'aceitou';
   EXCEPTION WHEN OTHERS THEN v_msg := SQLERRM; END;
-  RESET ROLE;
+  RESET ROLE; PERFORM set_config('app.qa_modo', 'on', true);
   IF v_msg NOT LIKE '%só mudam por função%' THEN r.situacao := 'falhou'; r.obtido := 'ACHADO: UPDATE direto passou (' || v_msg || ')'; PERFORM set_config('request.jwt.claims', COALESCE(v_claims, ''), true); PERFORM public.qa_mky_limpar(); RETURN r; END IF;
   r.passo_ordem := 2; r.passo_acao := 'Superadmin aprova pela função'; r.esperado := 'ativo com selo';
   PERFORM public.qa_mky_claims(v_sa); PERFORM public.marketye_moderar_especialista(e.prof_id, 'aprovado', NULL, true);
