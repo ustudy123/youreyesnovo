@@ -9,7 +9,7 @@
 -- Cole no SQL Editor do projeto. Roda em UMA transação; pode ser executado
 -- mais de uma vez (colunas IF NOT EXISTS, políticas recriadas, funções
 -- CREATE OR REPLACE, seeds com ON CONFLICT). É o mesmo conteúdo das
--- migrations 20260911210000, 20260911211000 e 20260911212000 (a de
+-- migrations 20260911220000, 20260911221000 e 20260911222000 (a de
 -- mobiliário da ilha de teste NÃO entra: é dado fictício do ambiente de teste).
 --
 -- O QUE MUDA EM DADO EXISTENTE (sem apagar nada): serviços ativos ganham

@@ -6,7 +6,7 @@
 // ligado pela ponte qa_cobertura_e2e: MKY-020, MKY-021, MKY-022.
 // MKY-020/021 entram com a conta-robô da empresa de teste; MKY-022 é público.
 // O mobiliário da ilha de teste ("Especialista Staging (QA)") é semeado pela
-// migration 20260911213000 só onde existe a Empresa Staging LTDA.
+// migration 20260911223000 só onde existe a Empresa Staging LTDA.
 // =====================================================================
 
 import { credenciaisDeTeste } from "../support/credenciais";

@@ -11,7 +11,7 @@ fora de propósito e como conferir no ambiente de teste.
 acesso e painel de QA passam a dizer **MarketYE**. "Parceiros" fica só para o
 Programa de Parceiros (canal de vendas).
 
-**Banco (migrations 20260911210000 / 211000 / 212000; script de entrega
+**Banco (migrations 20260911220000 / 221000 / 222000; script de entrega
 `docs/script_marketye_fundacao.sql`).**
 
 | Requisito | Como ficou |
