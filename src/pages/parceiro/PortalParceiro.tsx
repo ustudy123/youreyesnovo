@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Copy, Download, Link2, TrendingUp, Wallet, Users, Percent, Store, Clock, AlertTriangle } from "lucide-react";
+import { Copy, Download, Link2, TrendingUp, Wallet, Users, Percent, Store, Clock, Hourglass, FileSignature, MessageCircle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { ParceirosLayout } from "@/components/parceiro/ParceirosLayout";
-import { useParceiroPortal, formatarReais, linkPublico, ESTAGIO_LABEL, type CarteiraItem, type Estagio } from "@/hooks/useParceiroPortal";
+import { ParceirosLayout, CONTATO_WHATSAPP } from "@/components/parceiro/ParceirosLayout";
+import { useParceiroPortal, formatarReais, linkPublico, linkContratar, ESTAGIO_LABEL, type CarteiraItem, type Estagio } from "@/hooks/useParceiroPortal";
 import { PARCEIRO_TIPO_LABEL, PARCEIRO_TRILHA_LABEL, type ParceiroTrilha } from "@/hooks/useParceiros";
 
 const ESTAGIO_CLASSE: Record<Estagio, string> = {
@@ -25,9 +25,9 @@ export default function PortalParceiro() {
   const { dados, isLoading, isError } = useParceiroPortal();
   const [copiado, setCopiado] = useState<string | null>(null);
 
-  const copiar = async (codigo: string) => {
-    try { await navigator.clipboard?.writeText(linkPublico(codigo)); } catch { /* sem clipboard: mostra o link para copiar à mão */ }
-    setCopiado(codigo); toast.success("Link copiado"); setTimeout(() => setCopiado(null), 1800);
+  const copiar = async (chave: string, url: string) => {
+    try { await navigator.clipboard?.writeText(url); } catch { /* sem clipboard: mostra o link para copiar à mão */ }
+    setCopiado(chave); toast.success("Link copiado"); setTimeout(() => setCopiado(null), 1800);
   };
 
   const exportarCsv = () => {
@@ -59,18 +59,40 @@ export default function PortalParceiro() {
     <ParceirosLayout>
       {isLoading && <div className="space-y-4"><Skeleton className="h-28 w-full bg-white/10" /><Skeleton className="h-24 w-full bg-white/10" /></div>}
       {isError && <Card><p className="text-red-300">Não foi possível carregar o seu painel. Tente novamente em instantes.</p></Card>}
-      {dados && (
+      {dados && dados.parceiro.status !== "ativo" && (
+        <div className="max-w-2xl mx-auto py-8 space-y-5" data-testid="portal-parceiro-espera">
+          <Card className="text-center space-y-4">
+            {dados.parceiro.status === "pendente" ? <Hourglass className="w-10 h-10 mx-auto text-[#60ABEF]" /> : <Lock className="w-10 h-10 mx-auto text-amber-400" />}
+            <h1 className="text-2xl font-bold text-white">
+              {dados.parceiro.status === "pendente" ? "Cadastro em análise" : dados.parceiro.status === "suspenso" ? "Cadastro suspenso" : "Cadastro encerrado"}
+            </h1>
+            <p className="text-sm text-slate-300">Olá, {dados.parceiro.nome}. {dados.parceiro.status === "pendente"
+              ? `Recebemos o seu cadastro como ${PARCEIRO_TIPO_LABEL[dados.parceiro.tipo_parceiro] ?? dados.parceiro.tipo_parceiro} (trilha ${PARCEIRO_TRILHA_LABEL[dados.parceiro.trilha as ParceiroTrilha] ?? dados.parceiro.trilha}) em ${dataBr(dados.situacao?.criado_em)}. A equipe YourEyes avalia perfil, documentos e região de atuação e responde por e-mail, normalmente em até 2 dias úteis.`
+              : `Seu cadastro está ${dados.parceiro.status}. ${dados.situacao?.motivo ? `Motivo informado: ${dados.situacao.motivo}.` : ""} Fale com a equipe para reavaliar.`}
+            </p>
+            {dados.parceiro.status === "pendente" && (
+              <ol className="text-left text-sm text-slate-300 space-y-2 max-w-md mx-auto">
+                <li className="flex gap-2"><span className="text-emerald-400">✓</span> Cadastro enviado</li>
+                <li className="flex gap-2"><span className="text-[#60ABEF]">●</span> Aprovação da equipe YourEyes <span className="text-slate-500">(em andamento)</span></li>
+                <li className="flex gap-2"><span className="text-slate-500">○</span> Assinatura eletrônica do Contrato de Parceria</li>
+                <li className="flex gap-2"><span className="text-slate-500">○</span> Link de indicação e painel liberados</li>
+              </ol>
+            )}
+            <div className="flex flex-wrap justify-center gap-2 pt-2">
+              <Button asChild variant="outline" className="border-white/20 bg-transparent text-slate-100 hover:bg-white/10"><Link to="/parceiro/perfil">Completar meu cadastro</Link></Button>
+              <Button asChild variant="outline" className="border-white/20 bg-transparent text-slate-100 hover:bg-white/10"><Link to="/parceiros/contrato">Ler o contrato</Link></Button>
+              <Button asChild className="bg-[#FF8A00] hover:bg-[#e67a00] text-white"><a href={CONTATO_WHATSAPP} target="_blank" rel="noreferrer"><MessageCircle className="w-4 h-4 mr-1" />Falar com a equipe</a></Button>
+            </div>
+          </Card>
+          <p className="text-xs text-slate-500 text-center">Enquanto a aprovação não sai, o link de indicação não é gerado e nenhuma empresa é atribuída ao seu cadastro.</p>
+        </div>
+      )}
+      {dados && dados.parceiro.status === "ativo" && (
         <div className="space-y-6" data-testid="portal-parceiro">
           {dados.contrato?.pendente && (
             <div className="rounded-xl border border-[#60ABEF]/40 bg-[#60ABEF]/10 p-4 text-sm text-slate-100 flex flex-wrap items-center justify-between gap-3" data-testid="portal-contrato-pendente">
               <span>Há uma versão do <b>Contrato de Parceria</b> aguardando a sua assinatura eletrônica{dados.contrato.titulo_vigente ? ` (${dados.contrato.titulo_vigente})` : ""}.</span>
               <Button asChild size="sm" className="bg-[#FF8A00] hover:bg-[#e67a00] text-white"><Link to="/parceiros/contrato">Ler e assinar</Link></Button>
-            </div>
-          )}
-          {dados.parceiro.status !== "ativo" && (
-            <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-200 flex gap-2">
-              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>{dados.parceiro.status === "pendente" ? "Seu cadastro está em análise. Você já pode ver o painel; o link passa a atribuir clientes quando a aprovação sair." : `Cadastro ${dados.parceiro.status}. Fale com a equipe YourEyes.`}</span>
             </div>
           )}
 
@@ -113,20 +135,42 @@ export default function PortalParceiro() {
           {/* Link + funil */}
           <div className="grid lg:grid-cols-2 gap-4">
             <Card>
-              <h2 className="font-semibold text-white flex items-center gap-2"><Link2 className="w-4 h-4" />Seu link de indicação</h2>
-              <p className="text-xs text-slate-400 mb-3">Compartilhe para registrar a origem da conta automaticamente.</p>
-              {dados.links.map((l) => (
-                <div key={l.id} className="flex items-center gap-2 mb-2">
-                  <div className="flex-1 min-w-0 rounded-lg border border-white/15 bg-black/20 px-3 py-2 font-mono text-xs truncate" data-testid={l.campanha === "principal" ? "portal-link-principal" : undefined}>
-                    {linkPublico(l.codigo)}
-                    <span className="text-slate-500 ml-2">· {l.cliques} cliques · {l.leads} leads</span>
-                  </div>
-                  <Button size="sm" className="bg-[#FF8A00] hover:bg-[#e67a00] text-white" onClick={() => copiar(l.codigo)} data-testid={l.campanha === "principal" ? "portal-copiar-link" : undefined}>
-                    <Copy className="w-4 h-4 mr-1" />{copiado === l.codigo ? "Copiado ✓" : "Copiar"}
-                  </Button>
+              <h2 className="font-semibold text-white flex items-center gap-2"><Link2 className="w-4 h-4" />Seus links de indicação</h2>
+              {dados.contrato?.pendente ? (
+                <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-100 space-y-3" data-testid="portal-link-travado">
+                  <div className="flex items-start gap-2"><Lock className="w-4 h-4 mt-0.5 shrink-0" /><span>Seus links são liberados assim que você assinar eletronicamente o Contrato de Parceria.</span></div>
+                  <Button asChild size="sm" className="bg-[#FF8A00] hover:bg-[#e67a00] text-white"><Link to="/parceiros/contrato"><FileSignature className="w-4 h-4 mr-1" />Assinar o contrato agora</Link></Button>
                 </div>
-              ))}
-              <p className="text-[11px] text-slate-500 mt-2">Links por campanha são criados pela equipe YourEyes a seu pedido.</p>
+              ) : (
+                <>
+                  <p className="text-xs text-slate-400 mb-3">Dois jeitos de indicar. Os dois registram a origem da conta automaticamente por 90 dias.</p>
+                  {dados.links.map((l) => (
+                    <div key={l.id} className="space-y-2 mb-3">
+                      {l.campanha !== "principal" && <div className="text-[11px] uppercase tracking-wider text-slate-500">Campanha {l.campanha}</div>}
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-0 rounded-lg border border-white/15 bg-black/20 px-3 py-2" data-testid={l.campanha === "principal" ? "portal-link-principal" : undefined}>
+                          <div className="text-[11px] text-slate-400">Apresentação <span className="text-slate-500">· para quem ainda não conhece a YourEyes (redes, WhatsApp)</span></div>
+                          <div className="font-mono text-xs truncate">{linkPublico(l.codigo)}</div>
+                        </div>
+                        <Button size="sm" className="bg-[#FF8A00] hover:bg-[#e67a00] text-white" onClick={() => copiar(l.codigo, linkPublico(l.codigo))} data-testid={l.campanha === "principal" ? "portal-copiar-link" : undefined}>
+                          <Copy className="w-4 h-4 mr-1" />{copiado === l.codigo ? "Copiado ✓" : "Copiar"}
+                        </Button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-0 rounded-lg border border-white/15 bg-black/20 px-3 py-2">
+                          <div className="text-[11px] text-slate-400">Contratar <span className="text-slate-500">· para quem já decidiu: abre direto nos planos</span></div>
+                          <div className="font-mono text-xs truncate">{linkContratar(l.codigo)}</div>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-white/20 bg-transparent text-slate-100 hover:bg-white/10" onClick={() => copiar(l.codigo + "#", linkContratar(l.codigo))}>
+                          <Copy className="w-4 h-4 mr-1" />{copiado === l.codigo + "#" ? "Copiado ✓" : "Copiar"}
+                        </Button>
+                      </div>
+                      <div className="text-[11px] text-slate-500">{l.cliques} cliques · {l.leads} leads pelo código {l.codigo}</div>
+                    </div>
+                  ))}
+                  <p className="text-[11px] text-slate-500 mt-2">Links por campanha são criados pela equipe YourEyes a seu pedido.</p>
+                </>
+              )}
             </Card>
             <Card>
               <h2 className="font-semibold text-white">Conversões do seu funil</h2>

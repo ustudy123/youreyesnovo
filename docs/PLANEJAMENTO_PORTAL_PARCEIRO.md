@@ -319,6 +319,34 @@ portal (`parceiro_contrato_situacao` devolve `assinatura_token` enquanto
 pendente e `assinatura_id` depois). O cadastro (Edge Function e RPC) devolve o
 token e a tela leva direto à assinatura. Caso QA: PGP-016 (api).
 
+### 3.3 Aprovação em duas travas e portas de entrada (11/09/2026)
+
+Decisão do dono do produto: Representante e Operador não podem operar antes
+da aprovação. Implementado como duas travas em sequência: (1) **aprovação da
+casa** (`parceiros.status` pendente → ativo, em SuperAdmin › Parceiros, com
+Aprovar/Recusar e e-mail ao parceiro via `send-email-resend`, modelo
+genérico); (2) **contrato assinado** (a assinatura pendente só é gerada por
+`parceiro_contrato_iniciar_assinatura_para` quando o status é ativo, e a
+aprovação em `superadmin_parceiro_status` já a gera). Enquanto pendente, o
+portal mostra só a tela "Cadastro em análise"; enquanto o contrato não é
+assinado, o bloco de links fica travado. Indicador continua automático.
+`parceiro_meu_portal_com_contrato` passa a devolver `situacao` (status,
+motivo, datas) e `contrato.aguardando_aprovacao`.
+
+Indicação no site: `parceiro_ref_publico(codigo)` devolve nome/cidade do
+parceiro ativo; o site mostra a faixa "Você foi indicado por X" e rola até os
+planos quando o link traz `#planos`. O painel oferece dois links: apresentação
+(`/?ref=`) e contratar (`/?ref=...#planos`).
+
+Porta livre de cadastro de empresa (tela de login → /register, criava empresa
+sem plano e sem pagamento) fechada por padrão pela chave
+`app_config.cadastro_empresa_livre` ('nao'), lida por
+`cadastro_empresa_livre_ativo()` na tela e pela Edge Function
+`onboarding-signup` (recusa criar tenant, exceto chamada com chave de
+serviço). `cadastro_empresa_trial_dias` fica reservada para o período de
+teste (guardada, sem efeito no motor). SuperAdmin › Dados da YourEyes ›
+Portas de entrada edita as duas. Caso QA: PGP-017 (api).
+
 ## 4. Decisões que precisam do dono do produto antes da Onda 1
 
 1. **Trilhas e níveis**: quais trilhas existem (o mockup cita "Operador"), quais

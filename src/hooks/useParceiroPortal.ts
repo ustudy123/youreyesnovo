@@ -48,7 +48,8 @@ export interface PortalParceiroDados {
   extrato: { competencia: string; base_cents: number; percentual: number | null; valor_cents: number; status: string; tipo: string; pago_em: string | null }[];
   renovacoes: { nome: string; ciclo_fim: string; bonus_cents: number }[];
   historico?: { competencia: string; mrr_cents: number }[];
-  contrato?: { versao_vigente: number | null; titulo_vigente: string | null; versao_aceita: number | null; aceito_em: string | null; pendente: boolean; assinatura_token?: string | null; assinatura_id?: string | null };
+  contrato?: { versao_vigente: number | null; titulo_vigente: string | null; versao_aceita: number | null; aceito_em: string | null; pendente: boolean; aguardando_aprovacao?: boolean; assinatura_token?: string | null; assinatura_id?: string | null };
+  situacao?: { status: ParceiroStatus; motivo: string | null; aprovado_em: string | null; criado_em: string; trilha: string | null };
 }
 
 const KEY = ["parceiro", "portal"];
@@ -86,4 +87,8 @@ export function formatarReais(cents: number | null | undefined): string {
 export function linkPublico(codigo: string): string {
   const base = (import.meta.env.VITE_APP_URL as string | undefined) || window.location.origin;
   return `${base.replace(/\/$/, "")}/?ref=${codigo}`;
+}
+// Link direto para contratar: cai no site já na seção de planos, com a origem registrada.
+export function linkContratar(codigo: string): string {
+  return `${linkPublico(codigo)}#planos`;
 }

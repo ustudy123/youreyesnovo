@@ -59,16 +59,23 @@ export function ParceirosPanel() {
 
   const pendentes = parceiros.filter((p) => p.status === "pendente").length;
 
-  const aprovar = (p: Parceiro) => mudarStatus.mutate({ id: p.id, status: "ativo" });
+  const aprovar = async (p: Parceiro) => {
+    if (await confirm({ title: `Aprovar ${p.nome}?`, description: "O contrato de parceria é gerado na hora e o parceiro recebe um e-mail para assinar. O link de indicação só é liberado depois da assinatura." }))
+      mudarStatus.mutate({ id: p.id, status: "ativo", email: p.email, nome: p.nome });
+  };
+  const recusar = async (p: Parceiro) => {
+    if (await confirm({ title: `Recusar o cadastro de ${p.nome}?`, description: "O cadastro é encerrado e o parceiro recebe um e-mail informando. Ele pode falar com a equipe para reavaliar." }))
+      mudarStatus.mutate({ id: p.id, status: "encerrado", motivo: "Cadastro não aprovado pela equipe YourEyes", email: p.email, nome: p.nome });
+  };
   const suspender = async (p: Parceiro) => {
     if (await confirm({ title: `Suspender ${p.nome}?`, description: "O parceiro deixa de ser sugerido e de gerar comissão nova. A carteira dele fica preservada." }))
-      mudarStatus.mutate({ id: p.id, status: "suspenso", motivo: "Suspenso pelo SuperAdmin" });
+      mudarStatus.mutate({ id: p.id, status: "suspenso", motivo: "Suspenso pelo SuperAdmin", email: p.email, nome: p.nome });
   };
   const encerrar = async (p: Parceiro) => {
     if (await confirm({ title: `Encerrar ${p.nome}?`, description: "Encerramento é definitivo para o programa. Os clientes que ele originou continuam existindo normalmente." }))
-      mudarStatus.mutate({ id: p.id, status: "encerrado", motivo: "Encerrado pelo SuperAdmin" });
+      mudarStatus.mutate({ id: p.id, status: "encerrado", motivo: "Encerrado pelo SuperAdmin", email: p.email, nome: p.nome });
   };
-  const reativar = (p: Parceiro) => mudarStatus.mutate({ id: p.id, status: "ativo" });
+  const reativar = (p: Parceiro) => mudarStatus.mutate({ id: p.id, status: "ativo", email: p.email, nome: p.nome });
 
   return (
     <div className="space-y-6" data-testid="parceiros-panel">
@@ -142,6 +149,7 @@ export function ParceirosPanel() {
                           <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                             <div className="flex justify-end gap-1">
                               {p.status === "pendente" && <Button size="sm" onClick={() => aprovar(p)} data-testid="parceiro-aprovar"><CheckCircle className="w-4 h-4 mr-1" />Aprovar</Button>}
+                              {p.status === "pendente" && <Button size="sm" variant="outline" onClick={() => recusar(p)} data-testid="parceiro-recusar">Recusar</Button>}
                               {p.status === "ativo" && <Button size="sm" variant="ghost" title="Suspender" onClick={() => suspender(p)}><PauseCircle className="w-4 h-4" /></Button>}
                               {(p.status === "suspenso") && <Button size="sm" variant="ghost" title="Reativar" onClick={() => reativar(p)}><RotateCcw className="w-4 h-4" /></Button>}
                               {p.status !== "encerrado" && <Button size="sm" variant="ghost" title="Encerrar" onClick={() => encerrar(p)}><XCircle className="w-4 h-4 text-destructive" /></Button>}

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { sendEmail } from "@/utils/sendEmail";
 
 // Programa de Parceiros — dados para a gestão no SuperAdmin (Onda 1).
 // As tabelas ainda não estão em types.ts (regeneradas após aplicar no
@@ -196,9 +197,31 @@ export function useParceiros() {
   });
 
   const mudarStatus = useMutation({
-    mutationFn: async ({ id, status, motivo }: { id: string; status: ParceiroStatus; motivo?: string }) => {
-      const { error } = await sb.rpc("superadmin_parceiro_status", { _parceiro_id: id, _status: status, _motivo: motivo ?? null });
+    mutationFn: async (v: { id: string; status: ParceiroStatus; motivo?: string; email?: string | null; nome?: string | null }) => {
+      const { error } = await sb.rpc("superadmin_parceiro_status", { _parceiro_id: v.id, _status: v.status, _motivo: v.motivo ?? null });
       if (error) throw error;
+      // Avisa o parceiro por e-mail (não bloqueia a operação se o envio falhar)
+      if (v.email) {
+        const base = ((import.meta.env.VITE_APP_URL as string | undefined) || window.location.origin).replace(/\/$/, "");
+        const primeiro = (v.nome || "").split(" ")[0] || "parceiro(a)";
+        const conteudo = v.status === "ativo"
+          ? { assunto: "Seu cadastro no Programa de Parceiros YourEyes foi aprovado", titulo: `Bem-vindo(a), ${primeiro}!`,
+              mensagem: "Seu cadastro foi aprovado pela equipe YourEyes. O próximo passo é assinar eletronicamente o Contrato de Parceria: entre na Área do Parceiro, leia o contrato e assine com selfie e localização. Assim que assinar, seu link de indicação é liberado.",
+              actionUrl: `${base}/parceiros/contrato`, actionLabel: "Ler e assinar o contrato" }
+          : v.status === "suspenso"
+          ? { assunto: "Seu cadastro de parceiro YourEyes foi suspenso", titulo: `Olá, ${primeiro}`,
+              mensagem: `Seu cadastro no Programa de Parceiros foi suspenso. ${v.motivo ? `Motivo: ${v.motivo}. ` : ""}Sua carteira fica preservada; fale com a equipe YourEyes para regularizar.`,
+              actionUrl: `${base}/parceiros`, actionLabel: "Falar com a YourEyes" }
+          : v.status === "encerrado"
+          ? { assunto: "Sobre o seu cadastro no Programa de Parceiros YourEyes", titulo: `Olá, ${primeiro}`,
+              mensagem: `Seu cadastro no Programa de Parceiros não seguirá adiante. ${v.motivo ? `Motivo: ${v.motivo}. ` : ""}Se quiser conversar sobre isso, fale com a equipe YourEyes.`,
+              actionUrl: `${base}/parceiros`, actionLabel: "Falar com a YourEyes" }
+          : null;
+        if (conteudo) {
+          try { await sendEmail({ templateName: "generico", recipientEmail: v.email, templateData: conteudo }); }
+          catch (e) { console.error("aviso ao parceiro (nao-fatal):", e); toast.warning("Status atualizado, mas o e-mail de aviso não foi enviado."); }
+        }
+      }
     },
     onSuccess: () => { invalidar(); toast.success("Status atualizado"); },
     onError: erro,
