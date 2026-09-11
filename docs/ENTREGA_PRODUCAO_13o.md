@@ -32,7 +32,7 @@ do projeto de produção (`diayjpsrcerycycyaxst`).
 | 1 | 9 | todas **OK** |
 | 2 | 21 | todas **OK**. Se aparecer alguma linha `DUPLICADO: ... RESOLVER`, existem dois cálculos vivos da mesma parcela na base: cancele os que sobram e rode o script 2 de novo |
 | 3 | 7 | 6 **OK** + 1 **INFORMATIVO** dizendo quantas configurações duplicadas foram movidas para `backup_decimo_terceiro_config_<data>` |
-| 4 | 9 | 8 **OK** + 1 linha sobre o agendamento diário (em produção o `pg_cron` existe, então deve sair **OK**; se sair INFORMATIVO, a varredura funciona sob demanda pelo botão da tela) |
+| 4 | 9 | todas **OK**, inclusive o agendamento diário. Onde não há `pg_cron`, essa linha sai **INFORMATIVO** e a varredura funciona pelo botão da tela |
 | 5 | 8 | todas **OK** |
 | 6 | 6 | todas **OK** |
 

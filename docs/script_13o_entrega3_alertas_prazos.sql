@@ -379,7 +379,15 @@ GRANT  EXECUTE ON FUNCTION public.decimo_terceiro_alerta_gerar_acao(UUID, UUID, 
 DO $cron$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
-        PERFORM cron.unschedule('decimo_terceiro_alertas_diario');
+        -- A remocao vem PROTEGIDA: pedir para remover um agendamento que
+        -- ainda nao existe e erro no pg_cron, e o erro derrubaria o bloco
+        -- inteiro antes de criar o agendamento novo — que e justamente o
+        -- caso da primeira execucao. Padrao ja usado nas demais varreduras
+        -- da casa.
+        PERFORM cron.unschedule('decimo_terceiro_alertas_diario')
+          WHERE EXISTS (SELECT 1 FROM cron.job
+                         WHERE jobname = 'decimo_terceiro_alertas_diario');
+
         PERFORM cron.schedule('decimo_terceiro_alertas_diario', '25 6 * * *',
                               $c$SELECT public.decimo_terceiro_alertas_varrer();$c$);
         RAISE NOTICE 'Varredura de alertas do 13o agendada para as 06:25 diarias.';
@@ -423,5 +431,11 @@ SELECT 'agendamento diario da varredura',
             WHEN EXISTS (SELECT 1 FROM cron.job WHERE jobname='decimo_terceiro_alertas_diario') THEN 'OK'
             ELSE 'FALTOU' END,
        CASE WHEN NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname='pg_cron')
-            THEN 'pg_cron nao instalado neste banco: a varredura existe e roda sob demanda' END
+            THEN 'pg_cron nao instalado neste banco: a varredura existe e roda sob demanda'
+            WHEN NOT EXISTS (SELECT 1 FROM cron.job WHERE jobname='decimo_terceiro_alertas_diario')
+            THEN 'pg_cron instalado, mas o agendamento nao foi criado. A varredura funciona pelo '
+                 || 'botao da tela; para agendar, rode: SELECT cron.schedule('
+                 || quote_literal('decimo_terceiro_alertas_diario') || ', '
+                 || quote_literal('25 6 * * *') || ', '
+                 || quote_literal('SELECT public.decimo_terceiro_alertas_varrer();') || ');' END
  ORDER BY 2 DESC, 1;
