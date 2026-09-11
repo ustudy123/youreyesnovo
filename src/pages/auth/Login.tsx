@@ -18,6 +18,7 @@ import {
 import { useAuthContext } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Logo } from "@/components/ui/Logo";
+import { useCadastroLivre } from "@/hooks/useCadastroLivre";
 
 const loginSchema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -35,6 +36,7 @@ export default function Login({ destino, variante }: { destino?: string; variant
   const [showPassword, setShowPassword] = useState(false);
 
   const from = destino || location.state?.from?.pathname || "/";
+  const { livre: cadastroLivre } = useCadastroLivre();
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -167,9 +169,15 @@ export default function Login({ destino, variante }: { destino?: string; variant
       <div className="text-center">
         <p className="text-sm text-muted-foreground">
           Ainda não tem uma conta?{" "}
-          <Link to="/register" className="text-primary font-medium hover:underline">
-            Cadastre sua empresa
-          </Link>
+          {cadastroLivre ? (
+            <Link to="/register" className="text-primary font-medium hover:underline">
+              Cadastre sua empresa
+            </Link>
+          ) : (
+            <a href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/#planos`} className="text-primary font-medium hover:underline">
+              Conheça os planos e contrate
+            </a>
+          )}
         </p>
       </div>
     </div>

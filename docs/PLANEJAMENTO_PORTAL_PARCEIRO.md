@@ -280,6 +280,73 @@ Objetivo: fomentar o parceiro na região dele. Quando um lead entra **sem**
 
 ---
 
+### 3.2 Contrato de Parceria — onde se amarra
+
+Decisão (03/09/2026): o contrato se amarra **no cadastro**. Ninguém vira
+parceiro sem aceitar a versão vigente do Contrato de Parceria Comercial
+(clickwrap), e o aceite fica registrado com versão, hash do texto, data,
+usuário, IP e navegador (`parceiro_contratos_aceites`). O texto vive em
+`parceiro_contratos_versoes` (só o SuperAdmin publica, via
+`superadmin_parceiro_contrato_publicar`), é público em `/parceiros/contrato`
+e consolida a Política de Parceiros: modalidades e aprovação, atribuição
+(link 90 dias / casa), remuneração (níveis, base de tabela, fechamento 25 e
+pagamento 10, bônus, setup), obrigações, **confidencialidade e segredos
+comerciais** (5 anos; segredos enquanto durarem), **não concorrência e não
+aliciamento** (12 meses após o fim, limitado ao uso de informações e
+relacionamentos da parceria), marca, LGPD, vigência e rescisão. Versão nova
+pede aceite de novo: o portal mostra o aviso, o SuperAdmin vê a pendência e,
+após 60 dias, a parceria pode ser suspensa. Os Termos de Uso ganharam as
+cláusulas 5.1 (confidencialidade e segredos) e 5.2 (Programa de Parceiros).
+**Revisão jurídica recomendada** antes de aplicar em produção; o texto muda
+sem nova publicação de tela, só publicando outra versão na tabela.
+
+**Atualização (03/09/2026, pedido do dono do produto): o clickwrap deixou de
+bastar.** O aceite marcado no cadastro só manifesta a intenção
+(`parceiros.aceite_termos_em`). O contrato é **gerado por parceiro**
+(`parceiro_contrato_render_abnt`): qualificação das duas partes (YourEyes de
+`youreyes_empresa`, parceiro do cadastro), corpo v2 com a matriz vigente, fecho
+e campos de assinatura, tudo no **padrão ABNT** (fonte serifada 12 pt,
+entrelinha 1,5, justificado, recuo de parágrafo, margens 3 cm/2 cm em A4,
+títulos numerados). Esse HTML fica em `contratos_assinaturas.html_assinado`
+como registro **pendente** (token, 30 dias) do modelo categoria "parceria" da
+tela SuperAdmin › Contratos, que agora exige CPF, telefone, endereço, selfie e
+geolocalização. O parceiro assina em `/assinar-contrato/:token` — o MESMO fluxo
+dos contratos existentes: assinatura manuscrita em tela, selfie ao vivo, IP,
+navegador, coordenadas, data/hora e hash SHA-256 (Lei 14.063/2020, art. 4º, II;
+MP 2.200-2/2001, art. 10, § 2º). Só quando `registrar_assinatura_contrato`
+conclui é que `parceiro_contratos_aceites` ganha a versão e a pendência sai do
+portal (`parceiro_contrato_situacao` devolve `assinatura_token` enquanto
+pendente e `assinatura_id` depois). O cadastro (Edge Function e RPC) devolve o
+token e a tela leva direto à assinatura. Caso QA: PGP-016 (api).
+
+### 3.3 Aprovação em duas travas e portas de entrada (11/09/2026)
+
+Decisão do dono do produto: Representante e Operador não podem operar antes
+da aprovação. Implementado como duas travas em sequência: (1) **aprovação da
+casa** (`parceiros.status` pendente → ativo, em SuperAdmin › Parceiros, com
+Aprovar/Recusar e e-mail ao parceiro via `send-email-resend`, modelo
+genérico); (2) **contrato assinado** (a assinatura pendente só é gerada por
+`parceiro_contrato_iniciar_assinatura_para` quando o status é ativo, e a
+aprovação em `superadmin_parceiro_status` já a gera). Enquanto pendente, o
+portal mostra só a tela "Cadastro em análise"; enquanto o contrato não é
+assinado, o bloco de links fica travado. Indicador continua automático.
+`parceiro_meu_portal_com_contrato` passa a devolver `situacao` (status,
+motivo, datas) e `contrato.aguardando_aprovacao`.
+
+Indicação no site: `parceiro_ref_publico(codigo)` devolve nome/cidade do
+parceiro ativo; o site mostra a faixa "Você foi indicado por X" e rola até os
+planos quando o link traz `#planos`. O painel oferece dois links: apresentação
+(`/?ref=`) e contratar (`/?ref=...#planos`).
+
+Porta livre de cadastro de empresa (tela de login → /register, criava empresa
+sem plano e sem pagamento) fechada por padrão pela chave
+`app_config.cadastro_empresa_livre` ('nao'), lida por
+`cadastro_empresa_livre_ativo()` na tela e pela Edge Function
+`onboarding-signup` (recusa criar tenant, exceto chamada com chave de
+serviço). `cadastro_empresa_trial_dias` fica reservada para o período de
+teste (guardada, sem efeito no motor). SuperAdmin › Dados da YourEyes ›
+Portas de entrada edita as duas. Caso QA: PGP-017 (api).
+
 ## 4. Decisões que precisam do dono do produto antes da Onda 1
 
 1. **Trilhas e níveis**: quais trilhas existem (o mockup cita "Operador"), quais
@@ -321,6 +388,42 @@ Sem essas respostas, a Onda 1 entra com valores parametrizados em
 
 ---
 
+## 4.1 Política v2 (03/09/2026) — o que os anexos mudaram
+
+Os documentos "Programa de Parceiros YourEyes" (jul/2026) e a apresentação aos
+parceiros substituem várias decisões provisórias das Ondas 1-3:
+
+- **Trilhas** Indicador / Representante / Operador; o "tipo" (clínica,
+  contabilidade, consultoria…) vira perfil e sugere a trilha. Matriz de níveis
+  Foco (até R$ 4 mil) / Visão (R$ 4-12 mil) / Diamante (> R$ 12 mil):
+  6/8/10 %, 12/15/18 %, 20/25/30 %; participação no setup 20/25/30, 60/70/80,
+  100 % (Operador fatura direto). Tudo em `parceiro_niveis`, pré-preenchido.
+- **Base** = mensalidade efetivamente recebida (assinatura paga), líquida de
+  impostos (parâmetro) e do desconto concedido (`subscriptions.desconto_pct`).
+- **Ciclos de 24 meses** contados do go-live homologado, renovação automática
+  com bônus 2×; compromisso da casa limitado ao ciclo em curso (o fechamento
+  devolve `compromisso_ciclo_cents`).
+- **Setup** pago pelo cliente e repassado em 3 parcelas (30/40/30) contra 1ª
+  mensalidade, go-live homologado e 3ª mensalidade; bônus de retenção 90 dias
+  (+15 %); Fast Start, volume e velocidade; retenção de qualidade do Operador
+  (20 % por 3 meses); clawback 50 % entre o 4º e o 12º mês; inadimplência
+  retém. Marcos registrados pelo SuperAdmin em Empresas › Assinatura.
+- **43 parâmetros** em `parceiro_programa_config` (editáveis em Parceiros ›
+  Níveis e remuneração); o motor e o contrato leem de lá.
+- **Titularidade**: cláusula 2 do contrato v2 — a carteira é da YourEyes; o
+  parceiro tem o registro de originação e a garantia de não abordagem direta.
+  Não aliciamento e não concorrência por **24 meses**, confidencialidade 5 anos,
+  cessão em mudança de controle, Prêmio de Liquidez (múltiplo até 6×, teto a
+  fixar: sem teto, a cláusula não gera direito exigível), aviso de rescisão 90
+  dias, mediação + foro, nota sobre a Lei 4.886/1965.
+- **Contrato gerado por parceiro**: o texto v2 é preenchido com os dados das
+  duas partes e da matriz (padrão ABNT) e vira um registro **pendente** na tela
+  SuperAdmin › Contratos (modelo categoria "parceria" + `contratos_assinaturas`
+  com `parceiro_id` e `html_assinado`); passa a **assinado** só pela assinatura
+  eletrônica completa (selfie, IP, dispositivo, localização, hash) — seção 3.2.
+- Ainda sem automação (lançar por ajuste): 13º da carteira, Master Regional
+  (override calculado, mas elegibilidade manual), certificações.
+
 ## 5. Ondas de entrega (cada uma: migration + script de entrega + QA + teste no site de teste)
 
 **Estado (03/09/2026):** Ondas 0 e 1 implementadas e registradas no projeto,
@@ -344,12 +447,55 @@ robô-parceiro semeado por `seed-e2e-user`, seção pública `/parceiros`,
 atalho no menu do usuário, link "Parceiros" no site, aba Afiliados removida do
 Marketplace (entra o convite). Cypress `portal-parceiro.cy.ts` cobre PGP-030 a
 032. Script: `docs/script_parceiros_onda2.sql`.
+Retoques (03/09/2026, após revisão do dono): menu do site mais espaçado e
+sem o botão Diagnóstico na barra; logo local (o asset do Lovable não carrega
+fora do domínio dele); cards de tipo de parceiro abrem detalhe (para quem é, o
+que faz, como ganha, aprovação, requisitos); Fale conosco (WhatsApp e e-mail)
+na seção pública; Termos de Uso com confidencialidade/segredos e programa de
+parceiros; Contrato de Parceria com aceite eletrônico (seção 3.2),
+`docs/script_parceiros_contrato.sql`.
+**Onda 3 (03/09/2026):** implementada. `20260904150000_parceiros_motor_comissoes.sql`:
+`parceiro_fechar_competencia` (snapshot de MRR por parceiro/cliente, comissão
+recorrente pela tabela de níveis e atribuição link/casa, retenção automática em
+inadimplência, comissão zero com rastro em plano interno, evento de setup do
+implantador lido de `parceiro_eventos_remuneracao`, bônus de renovação pelo
+multiplicador do nível, promoção de nível sem rebaixamento), agendamento pg_cron
+`parceiros-fechamento-mensal` (dia 25, 06:30), funções do SuperAdmin (listar
+por competência, marcar pago/retido/fechado, ajuste), sugestão por localidade
+`parceiros_sugerir_para_lead` (mesma cidade › mesmo estado › distância; sem
+extensão nova) e `superadmin_lead_encaminhar` (atribuição casa), `leads.cidade/uf`,
+histórico de 12 meses no portal. Rotinas PGP-010/012/013/014 passam na réplica
+(escrevem só no cercado qa-sandbox). Telas: sub-aba **Comissões** (prévia,
+fechar, resumo por parceiro com PIX, marcar pago/reter, ajuste), botão "Sugerir
+parceiro por localidade" no Kanban de leads, gráfico "Sua evolução" no portal.
+Script: `docs/script_parceiros_onda3.sql`.
+**Política v2 + Onda 4 (03/09/2026):** `20260904160000_parceiros_politica_v2.sql`
+(matriz, config, marcos do cliente, motor v2, contrato v2 na tela de Contratos),
+`20260904170000_parceiros_captura_ref.sql` (resolver ref, clique, trigger da
+landing, origem no tenant via webhook/onboarding, PGP-015),
+`20260904180000_leads_meta_ads_standby.sql` + Edge Function
+`meta-leads-webhook` (porta para leads de tráfego pago da Meta, desligada até
+preencher `meta_*` em `app_config`). Telas: cards por trilha com exemplos e
+"o que não precisa fazer", cadastro por trilha + perfil, SuperAdmin com matriz
+por trilha, parâmetros e bônus, cartão de marcos em Empresas › Assinatura,
+origem Meta Ads no Kanban, captura do `?ref=` no site e na landing. Scripts:
+`docs/script_parceiros_politica_v2.sql`, `docs/script_parceiros_onda4.sql`.
+**Dados fiscais da YourEyes (03/09/2026):** `20260904190000_youreyes_dados_fiscais.sql`
+cria o registro único `youreyes_empresa` (razão social, CNPJ, inscrições,
+endereço, contato, representante legal, foro, regime), editável em
+SuperAdmin › **Dados da YourEyes**; leitura pública sem CPF; o Contrato de
+Parceria passa a identificar a contratante por esses dados (`{{YE_*}}`).
+Script: `docs/script_youreyes_dados_fiscais.sql`.
 Pendências anotadas: (a) PGP-020/021 (aba Parceiros do SuperAdmin) seguem sem
 teste de tela porque a conta-robô não é superadmin e não deve virar; precisa de
 um robô-superadmin próprio. (b) A data de go-live usa `profiles.updated_at` do
 onboarding concluído como aproximação; a Onda 3 passa a gravar a data no
 snapshot mensal. (c) Cliques no link e gráfico de 12 meses só nascem nas Ondas
-3 e 4 (o portal já reserva o lugar).
+3 e 4 (o portal já reserva o lugar). (d) **Bloqueio de ambiente**: o secret
+`QA_E2E_TOKEN` não está cadastrado no repositório; sem ele a esteira pula a
+semeadura das contas-robô e não envia o resultado do Cypress ao painel de QA.
+O spec do portal pula (pendente, com aviso) enquanto o robô-parceiro não
+existir. Cadastrar o secret é gesto do dono do repositório.
 
 ### Onda 0 — Documentação de testes (antes de qualquer código)
 - `qa_modulos`: novo módulo `parceiros` (SuperAdmin) e `portal-parceiro`.

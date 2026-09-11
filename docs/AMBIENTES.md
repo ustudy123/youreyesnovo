@@ -233,8 +233,10 @@ O que ela faz, e o que impede:
    chamam ninguém);
 8. **publica as Edge Functions** no projeto da homologação (mesmo padrão da
    esteira do staging: CLI fixada + link + deploy com 3 tentativas). Roda
-   também no modo `so_finalizar`, que vira o jeito barato (~min) de
-   atualizar functions sem refazer a cópia. As chaves de plataforma o
+   também no modo `so_finalizar`. **Para só atualizar functions, porém, prefira
+   o botão dedicado `homologacao-funcoes.yml`** (sem `RECRIAR`; ver **Manter a
+   homologação em dia**) — este passo aqui existe porque a recriação também
+   precisa dele. As chaves de plataforma o
    Supabase injeta sozinho; chaves de recurso (`OPENAI_API_KEY`,
    `RESEND_API_KEY`, `GITHUB_DISPATCH_TOKEN`...) são segredos do projeto,
    configurados no painel por quem decidir usar o recurso na homologação —
@@ -447,6 +449,22 @@ script só na produção e esquecer dela.
   da homologação. Enquanto a preservação dos casos (opções A/B) não estiver
   implementada, a homologação **não** é recriada — ela só anda para frente, pelos
   próprios scripts de entrega.
+- **Cada tipo de mudança chega por um caminho diferente** (é o que substitui o
+  antigo "recria tudo"):
+  - **Telas** (o que se vê e clica): sozinhas, a cada merge — a esteira reconstrói
+    e republica o site da homologação (`.../homologacao/`) junto com o de teste.
+  - **Banco** (estrutura/dados): pelo **script de entrega** colado no SQL Editor da
+    homologação, ANTES da produção (o fluxo forward-only).
+  - **Funções de servidor** (Edge Functions): pelo botão **`homologacao-funcoes.yml`**
+    (Actions → `homologacao-funcoes` → **Run workflow**, ~2 min). Ele republica as
+    functions do repositório na homologação **sem `RECRIAR`** — não lê a produção,
+    não recria o schema, não copia/apaga dados, não toca na estrutura de QA
+    acumulada; alvo fixo na homologação, com aborto se o ref apontar para a
+    produção. Reusa o mesmo passo de deploy provado no `homologacao.yml` e os
+    mesmos secrets (`SUPABASE_ACCESS_TOKEN`, `HOMOLOGACAO_DB_PASSWORD`). É a porta a
+    usar sempre que uma função nova/alterada precisar ir para a homologação (foi o
+    que fechou os testes do Portal do Parceiro, presos em "sem rotina" porque a
+    `seed-e2e-user` da homologação estava desatualizada).
 - **Confira quando desconfiar:** os scripts
   `docs/script_divergencia_producao_parte*.sql` comparam qualquer ambiente com o
   repositório. Rodando os mesmos na produção e na homologação, a diferença entre
@@ -481,11 +499,14 @@ produção, toda cópia futura já nasce com a camada — o painel sobrevive ao
 `qa_cobertura_e2e` está na lista de tabelas preservadas da máscara, então a
 ponte caso↔teste atravessa a cópia intacta.
 
-**Pré-requisito (uma vez, depois de mesclar):** as Edge Functions precisam estar
-publicadas na homologação com a versão nova (a `seed-e2e-user` aceita o ref da
-homologação; a `qa-disparar-cypress` detecta o ambiente). Rode o workflow
-`homologacao` no modo **`so_finalizar`** (~2 min) — ele republica as functions
-sem refazer a cópia.
+**Pré-requisito (depois de mesclar função nova):** as Edge Functions precisam estar
+publicadas na homologação com a versão nova (a `seed-e2e-user` que semeia a conta-robô,
+a `qa-disparar-cypress` que detecta o ambiente etc.). Rode o botão
+**`homologacao-funcoes.yml`** (Actions → `homologacao-funcoes` → **Run workflow**,
+~2 min) — a porta sancionada que republica só as functions, sem `RECRIAR`. (O modo
+`so_finalizar` do `homologacao.yml` faz o mesmo deploy, mas passa pelo gate do
+`RECRIAR` e pela conferência de fidelidade, que pós-09/2026 pode não fechar — prefira
+a porta dedicada.)
 
 **Segredos:**
 
@@ -615,7 +636,8 @@ O workflow tem trava contra apontar para a produção e pode ser disparado manua
 
 Outros workflows do repositório:
 
-- `homologacao.yml` — recria a homologação a partir da estrutura da produção (por botão, digitando `RECRIAR`). Ver **Manter a homologação em dia**.
+- `homologacao.yml` — recria a homologação a partir da estrutura da produção (por botão, digitando `RECRIAR`). **SUSPENSO desde 09/2026.** Ver **Manter a homologação em dia**.
+- `homologacao-funcoes.yml` — **publica só as Edge Functions na homologação** (por botão, sem `RECRIAR`, ~2 min). É a porta sancionada para levar função nova/alterada à homologação no fluxo forward-only. Ver **Manter a homologação em dia**.
 - `cypress.yml` — dispara a suíte de tela contra o **teste**, sob demanda.
 - `cypress-homologacao.yml` — dispara a suíte de tela contra a **homologação**. Ver **Testes de tela (Cypress) na homologação**.
 

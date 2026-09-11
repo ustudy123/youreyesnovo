@@ -9,9 +9,9 @@ import { PARCEIRO_TIPO_LABEL, PARCEIRO_STATUS_LABEL } from "@/hooks/useParceiros
 
 export default function PerfilParceiro() {
   const { dados, isLoading, salvarPerfil } = useParceiroPortal();
-  const [f, setF] = useState({ email: "", telefone: "", cidade: "", uf: "", cep: "", pix_chave: "" });
+  const [f, setF] = useState({ email: "", telefone: "", endereco: "", cidade: "", uf: "", cep: "", pix_chave: "" });
   useEffect(() => {
-    if (dados) setF({ email: dados.parceiro.email ?? "", telefone: dados.parceiro.telefone ?? "", cidade: dados.parceiro.cidade ?? "", uf: dados.parceiro.uf ?? "", cep: "", pix_chave: dados.parceiro.pix_chave ?? "" });
+    if (dados) setF({ email: dados.parceiro.email ?? "", telefone: dados.parceiro.telefone ?? "", endereco: dados.parceiro.endereco ?? "", cidade: dados.parceiro.cidade ?? "", uf: dados.parceiro.uf ?? "", cep: "", pix_chave: dados.parceiro.pix_chave ?? "" });
   }, [dados]);
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF((x) => ({ ...x, [k]: e.target.value }));
 
@@ -30,6 +30,7 @@ export default function PerfilParceiro() {
             <div><Label className="text-slate-300">Cidade</Label><Input className="bg-black/20 border-white/15 text-white" value={f.cidade} onChange={set("cidade")} /></div>
             <div className="grid grid-cols-2 gap-2">
               <div><Label className="text-slate-300">UF</Label><Input className="bg-black/20 border-white/15 text-white uppercase" maxLength={2} value={f.uf} onChange={set("uf")} /></div>
+              <div className="sm:col-span-2"><Label className="text-slate-300">Endereço (rua, número, bairro)</Label><Input className="bg-black/20 border-white/15 text-white" value={f.endereco} onChange={set("endereco")} /></div>
               <div><Label className="text-slate-300">CEP</Label><Input className="bg-black/20 border-white/15 text-white" value={f.cep} onChange={set("cep")} placeholder="mantém o atual" /></div>
             </div>
             <div className="col-span-2"><Label className="text-slate-300">Chave PIX para pagamento das comissões</Label><Input className="bg-black/20 border-white/15 text-white" value={f.pix_chave} onChange={set("pix_chave")} placeholder="CPF/CNPJ, e-mail, telefone ou chave aleatória" />

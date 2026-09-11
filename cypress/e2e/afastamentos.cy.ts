@@ -75,4 +75,10 @@ describe("Módulo Afastamentos (Central GAF)", () => {
   it("tem a busca por trabalhador ou CID", () => {
     cy.get('input[placeholder*="Buscar trabalhador"]', { timeout: 20000 }).should("exist");
   });
+
+  // AFAST-TELA-07
+  it("abre a aba FAP/RAT com o cartão de CAT Pendente", () => {
+    abrirAba("FAP/RAT");
+    cy.contains("CAT Pendente", { timeout: 20000 }).should("be.visible");
+  });
 });

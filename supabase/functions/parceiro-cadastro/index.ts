@@ -18,11 +18,12 @@ const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
 const TIPOS = ["indicador", "representante", "implantador", "clinica", "contabilidade"];
+const TRILHAS = ["indicador", "representante", "operador"];
 
 type Payload = {
-  nome?: string; email?: string; senha?: string; tipo_parceiro?: string; tipo_pessoa?: string;
-  documento?: string; telefone?: string; cidade?: string; uf?: string; cep?: string;
-  raio_atuacao_km?: number; aceite_termos?: boolean;
+  nome?: string; email?: string; senha?: string; tipo_parceiro?: string; trilha?: string; tipo_pessoa?: string;
+  documento?: string; telefone?: string; endereco?: string; cidade?: string; uf?: string; cep?: string;
+  raio_atuacao_km?: number; aceite_termos?: boolean; user_agent?: string;
 };
 
 serve(async (req) => {
@@ -40,6 +41,7 @@ serve(async (req) => {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: "E-mail inválido" }, 400);
   if (senha.length < 6) return json({ error: "A senha precisa ter ao menos 6 caracteres" }, 400);
   if (!TIPOS.includes(tipo)) return json({ error: "Tipo de parceiro inválido" }, 400);
+  const trilha = p.trilha && TRILHAS.includes(p.trilha) ? p.trilha : null; // null = o banco deriva do perfil
   if (p.aceite_termos !== true) return json({ error: "É preciso aceitar os termos do programa" }, 400);
 
   const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
@@ -66,8 +68,8 @@ serve(async (req) => {
     .from("parceiros")
     .insert({
       nome, tipo_pessoa: p.tipo_pessoa === "pf" ? "pf" : "pj", documento: p.documento || null,
-      tipo_parceiro: tipo, email, telefone: p.telefone || null, cidade: p.cidade || null,
-      uf: p.uf ? String(p.uf).toUpperCase() : null, cep: p.cep || null,
+      tipo_parceiro: tipo, trilha, email, telefone: p.telefone || null, cidade: p.cidade || null,
+      uf: p.uf ? String(p.uf).toUpperCase() : null, cep: p.cep || null, endereco: p.endereco?.trim() || null,
       raio_atuacao_km: Number.isFinite(p.raio_atuacao_km) ? p.raio_atuacao_km : 50,
       aceite_termos_em: new Date().toISOString(), created_by: userId,
     })
@@ -81,5 +83,18 @@ serve(async (req) => {
   const { error: vErr } = await admin.from("parceiro_usuarios").insert({ parceiro_id: parceiro.id, user_id: userId, papel: "dono" });
   if (vErr) return json({ error: "Conta criada, mas o vínculo falhou: " + vErr.message }, 500);
 
-  return json({ ok: true, parceiro_id: parceiro.id, codigo: parceiro.codigo, status: parceiro.status });
+  // O aceite marcado no formulário só manifesta a intenção (aceite_termos_em).
+  // O contrato de verdade é gerado com os dados das duas partes e fica PENDENTE
+  // até a assinatura eletrônica (assinatura, selfie, IP, dispositivo, localização,
+  // hash) em /assinar-contrato/:token — o mesmo fluxo dos contratos do SuperAdmin.
+  let contratoToken: string | null = null;
+  try {
+    const { data: ini, error: iniErr } = await admin.rpc("parceiro_contrato_iniciar_assinatura_para", { p_parceiro_id: parceiro.id });
+    if (iniErr) console.error("contrato pendente (nao-fatal):", iniErr.message);
+    contratoToken = (ini as { token?: string } | null)?.token ?? null;
+  } catch (e) {
+    console.error("contrato pendente (nao-fatal):", (e as Error).message);
+  }
+
+  return json({ ok: true, parceiro_id: parceiro.id, codigo: parceiro.codigo, status: parceiro.status, contrato_token: contratoToken });
 });
