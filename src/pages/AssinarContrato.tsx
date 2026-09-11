@@ -100,6 +100,7 @@ export default function AssinarContrato() {
       setSignatarioEmail(result.assinatura?.signatario_email || "");
       if (result.assinatura?.signatario_cpf) setCpf(result.assinatura.signatario_cpf);
       if (result.assinatura?.signatario_telefone) setTelefone(result.assinatura.signatario_telefone);
+      if (result.assinatura?.signatario_endereco) setEndereco(result.assinatura.signatario_endereco);
       if (result.assinatura?.signatario_cnpj) setCnpj(result.assinatura.signatario_cnpj);
       if (result.assinatura?.signatario_razao_social) setRazaoSocial(result.assinatura.signatario_razao_social);
       if (result.assinatura?.signatario_email) setEmail(result.assinatura.signatario_email);

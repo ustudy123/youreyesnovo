@@ -28,7 +28,7 @@ export default function CadastroParceiro() {
   const { user, parceiroId, signIn, loading: authLoading } = useAuthContext();
   const [params] = useSearchParams();
   const trilhaInicial = (["indicador","representante","operador"].includes(params.get("trilha") || "") ? params.get("trilha") : "indicador") as ParceiroTrilha;
-  const [f, setF] = useState({ nome: "", email: user?.email ?? "", senha: "", trilha: trilhaInicial, tipo_parceiro: (trilhaInicial === "operador" ? "clinica" : trilhaInicial) as ParceiroTipo, tipo_pessoa: "pj", documento: "", telefone: "", cidade: "", uf: "", cep: "", aceite: false });
+  const [f, setF] = useState({ nome: "", email: user?.email ?? "", senha: "", trilha: trilhaInicial, tipo_parceiro: (trilhaInicial === "operador" ? "clinica" : trilhaInicial) as ParceiroTipo, tipo_pessoa: "pj", documento: "", telefone: "", endereco: "", cidade: "", uf: "", cep: "", aceite: false });
   const [enviando, setEnviando] = useState(false);
   const set = (k: keyof typeof f, v: string | boolean) => setF((x) => ({ ...x, [k]: v }));
 
@@ -125,6 +125,7 @@ export default function CadastroParceiro() {
               </Select>
             </div>
             <div><Label className="text-slate-300">CEP</Label><Input className="bg-black/20 border-white/15 text-white" value={f.cep} onChange={(e) => set("cep", e.target.value)} /></div>
+            <div className="sm:col-span-3"><Label className="text-slate-300">Endereço (rua, número, bairro)</Label><Input className="bg-black/20 border-white/15 text-white" value={f.endereco} onChange={(e) => set("endereco", e.target.value)} placeholder="Usado no contrato de parceria" /></div>
           </div>
           {!user && (
             <>

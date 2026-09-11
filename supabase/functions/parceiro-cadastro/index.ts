@@ -22,7 +22,7 @@ const TRILHAS = ["indicador", "representante", "operador"];
 
 type Payload = {
   nome?: string; email?: string; senha?: string; tipo_parceiro?: string; trilha?: string; tipo_pessoa?: string;
-  documento?: string; telefone?: string; cidade?: string; uf?: string; cep?: string;
+  documento?: string; telefone?: string; endereco?: string; cidade?: string; uf?: string; cep?: string;
   raio_atuacao_km?: number; aceite_termos?: boolean; user_agent?: string;
 };
 
@@ -69,7 +69,7 @@ serve(async (req) => {
     .insert({
       nome, tipo_pessoa: p.tipo_pessoa === "pf" ? "pf" : "pj", documento: p.documento || null,
       tipo_parceiro: tipo, trilha, email, telefone: p.telefone || null, cidade: p.cidade || null,
-      uf: p.uf ? String(p.uf).toUpperCase() : null, cep: p.cep || null,
+      uf: p.uf ? String(p.uf).toUpperCase() : null, cep: p.cep || null, endereco: p.endereco?.trim() || null,
       raio_atuacao_km: Number.isFinite(p.raio_atuacao_km) ? p.raio_atuacao_km : 50,
       aceite_termos_em: new Date().toISOString(), created_by: userId,
     })
