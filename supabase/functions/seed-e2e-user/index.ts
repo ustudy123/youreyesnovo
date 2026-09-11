@@ -192,10 +192,17 @@ async function semearFixturesProfundas(admin: Admin, userId: string) {
 // listagem, filtro por nível e consolidação. Também sustenta o vazio-por-busca
 // de METAS-TELA-09 (com metas na base, buscar texto inexistente esvazia a lista).
 // Idempotente: só insere se o tenant ainda não tiver nenhuma meta. NÃO-FATAL.
+const META_SENTINELA = "Reduzir índice de acidentes em 20% (QA)";
 async function semearMetas(admin: Admin, userId: string) {
+  // Guarda pela MINHA meta-sentinela (não por "qualquer meta"): o tenant da
+  // ilha pode já ter metas de outra origem (ex.: demo) com empresa_id que não
+  // é o da ilha — invisíveis na lista filtrada por empresa, mas presentes na
+  // tabela. Checar "qualquer meta" faria o seed pular e as minhas nunca
+  // entrariam (foi o que quebrou METAS-TELA-09/10/11 no teste). Idempotente.
   const { data: metaExist } = await admin
-    .from("metas").select("id").eq("tenant_id", TENANT_ID).limit(1);
-  if (metaExist && metaExist.length > 0) return; // já semeado — não duplica
+    .from("metas").select("id")
+    .eq("tenant_id", TENANT_ID).eq("titulo", META_SENTINELA).limit(1);
+  if (metaExist && metaExist.length > 0) return; // minhas metas já semeadas
 
   // Departamento de RH para a meta de setor (setor_id -> departamentos).
   const { data: deptRH } = await admin
@@ -223,7 +230,7 @@ async function semearMetas(admin: Admin, userId: string) {
     {
       ...comum,
       nivel: "estrategica",
-      titulo: "Reduzir índice de acidentes em 20% (QA)",
+      titulo: META_SENTINELA,
       descricao: "Meta fictícia de QA — reduzir acidentes de trabalho no ano.",
       status: "em_andamento",
       progresso: 40,
