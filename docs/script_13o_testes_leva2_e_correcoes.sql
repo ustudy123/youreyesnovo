@@ -1083,40 +1083,30 @@ INSERT INTO public.qa_implementacoes (codigo, funcao_sql, ativo) VALUES
 ON CONFLICT (codigo) DO UPDATE SET funcao_sql = EXCLUDED.funcao_sql, ativo = true;
 
 -- ── Conferencia final ─────────────────────────────────────────────────
-WITH esperado AS MATERIALIZED (
-    SELECT unnest(ARRAY['DEC13-004','DEC13-005','DEC13-006','DEC13-022','DEC13-023',
-                        'DEC13-034','DEC13-035','DEC13-043','DEC13-052','DEC13-061',
-                        'DEC13-062','DEC13-063','DEC13-072','DEC13-073']) AS codigo
-)
-SELECT 'caso documentado e com rotina: ' || e.codigo AS item,
-       CASE WHEN EXISTS (SELECT 1 FROM public.qa_casos_teste c WHERE c.codigo = e.codigo)
-             AND EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
-                          WHERE n.nspname='public'
-                            AND p.proname = 'qa_caso_dec13_' || lower(right(e.codigo, 3)))
-            THEN 'OK' ELSE 'FALTOU' END AS situacao,
-       NULL::text AS erro_tecnico
-  FROM esperado e
- UNION ALL
-SELECT 'aviso previo indenizado projeta o tempo (CLT art. 487 §1o)',
-       CASE WHEN position('v_fim_contrato' in p.prosrc) > 0 THEN 'OK' ELSE 'FALTOU' END,
+SELECT 'aviso previo indenizado projeta o tempo (CLT art. 487 §1o)' AS item,
+       CASE WHEN position('v_fim_contrato' in p.prosrc) > 0 THEN 'OK' ELSE 'FALTOU' END AS situacao,
        CASE WHEN position('v_fim_contrato' in p.prosrc) > 0 THEN NULL
-            ELSE 'decimo_terceiro_avos nao foi substituida' END
+            ELSE 'decimo_terceiro_avos nao foi substituida' END AS erro_tecnico
   FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
  WHERE n.nspname='public' AND p.proname='decimo_terceiro_avos'
  UNION ALL
 SELECT 'acidente de trabalho nao derruba avo (Sumula 46 do TST)',
-       CASE WHEN position('B91' in p.prosrc) = 0
-             AND position('''B31'', ''B32''' in p.prosrc) > 0 THEN 'OK'
-            WHEN position('''B31'', ''B32''' in p.prosrc) > 0 THEN 'OK'
-            ELSE 'FALTOU' END,
+       CASE WHEN position('''B31'', ''B32''' in p.prosrc) > 0 THEN 'OK' ELSE 'FALTOU' END,
        CASE WHEN position('''B31'', ''B32''' in p.prosrc) > 0 THEN NULL
             ELSE 'as especies acidentarias ainda entram no desconto de dias' END
   FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
  WHERE n.nspname='public' AND p.proname='decimo_terceiro_avos'
  UNION ALL
-SELECT 'total de casos documentados do 13o',
-       CASE WHEN count(*) >= 31 THEN 'OK' ELSE 'FALTOU' END,
-       'documentados: ' || count(*)::text || ' (17 da 1a leva + 14 desta)'
+-- A Documentacao de testes NAO vem mais neste script: ela nasceu por
+-- migration, que so alcanca o ambiente de teste, e por isso em outros
+-- ambientes aparecia "documentados: 0". Quem a leva, inteira e
+-- autossuficiente, e o script_13o_documentacao_testes.sql.
+SELECT 'Documentacao de testes do 13o nesta base',
+       CASE WHEN count(*) >= 31 THEN 'OK' ELSE 'INFORMATIVO' END,
+       CASE WHEN count(*) >= 31 THEN 'documentados: ' || count(*)::text
+            ELSE 'documentados: ' || count(*)::text || ' de 31 — para completar, cole o '
+                 || 'script_13o_documentacao_testes.sql. As correcoes de lei acima '
+                 || 'independem disso e ja estao valendo' END
   FROM public.qa_casos_teste c
   JOIN public.qa_modulos m ON m.id = c.modulo_id
  WHERE m.path = 'financeiro/decimo-terceiro'
