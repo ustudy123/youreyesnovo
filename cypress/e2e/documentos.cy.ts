@@ -71,4 +71,16 @@ describe("Módulo Documentos", () => {
   it("abre a aba Auditoria", () => {
     abrirAba("Auditoria");
   });
+
+  // DOCS-TELA-07
+  it("abre a aba PDCA", () => {
+    abrirAba("PDCA");
+    cy.contains("Motor de Melhoria Contínua", { timeout: 20000 }).should("be.visible");
+  });
+
+  // DOCS-TELA-08
+  it("abre a aba Notificações", () => {
+    abrirAba("Notificações");
+    cy.contains("Configuração de Alertas", { timeout: 20000 }).should("be.visible");
+  });
 });

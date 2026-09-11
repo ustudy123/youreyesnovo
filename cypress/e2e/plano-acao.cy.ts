@@ -72,4 +72,24 @@ describe("Módulo Plano de Ação", () => {
   it("abre a aba Críticas", () => {
     abrirAba("Críticas");
   });
+
+  // PACAO-TELA-05
+  it("tem os chips de prioridade Imediato e Urgente", () => {
+    cy.contains("Imediato", { timeout: 20000 }).should("exist");
+    cy.contains("Urgente").should("exist");
+  });
+
+  // PACAO-TELA-08
+  it("abre o painel de filtros avançados", () => {
+    cy.contains("button", "Filtros", { timeout: 20000 }).click({ force: true });
+    cy.contains("Responsável", { timeout: 20000 }).should("be.visible");
+    cy.contains("Origem").should("be.visible");
+  });
+
+  // PACAO-TELA-09
+  it("mostra os cartões de estatística", () => {
+    cy.contains("Total de Ações", { timeout: 20000 }).should("be.visible");
+    cy.contains("Atrasadas").should("exist");
+    cy.contains("Índice de Execução").should("exist");
+  });
 });
