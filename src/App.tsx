@@ -47,6 +47,10 @@ import Financeiro from "./pages/Financeiro";
 import Academia from "./pages/Academia";
 import Empresa from "./pages/Empresa";
 import Marketplace from "./pages/Marketplace";
+import MarketYEPublico from "./pages/marketye/MarketYEPublico";
+import CadastroEspecialista from "./pages/marketye/CadastroEspecialista";
+import PortalEspecialista from "./pages/marketye/PortalEspecialista";
+import { EspecialistaRoute } from "./components/auth/EspecialistaRoute";
 import Terceiros from "./pages/Terceiros";
 import IncidentesAcidentes from "./pages/IncidentesAcidentes";
 import CulturaCelebracoes from "./pages/CulturaCelebracoes";
@@ -180,12 +184,17 @@ const App = () => (
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/parceiros/entrar" element={<Login destino="/parceiro" variante="parceiro" />} />
+                <Route path="/marketye/entrar" element={<Login destino="/marketye/portal" variante="especialista" />} />
               </Route>
 
               {/* Programa de Parceiros — seção pública do site e Área do Parceiro (fora do sistema) */}
               <Route path="/parceiros" element={<ParceirosPublico />} />
               <Route path="/parceiros/cadastro" element={<CadastroParceiro />} />
               <Route path="/parceiros/contrato" element={<ContratoParceria />} />
+              {/* MarketYE: página pública de captação, cadastro do especialista (sem acesso ao sistema) e portal restrito */}
+              <Route path="/marketye" element={<MarketYEPublico />} />
+              <Route path="/marketye/cadastro" element={<CadastroEspecialista />} />
+              <Route path="/marketye/portal" element={<EspecialistaRoute><PortalEspecialista /></EspecialistaRoute>} />
               <Route path="/parceiro" element={<ParceiroRoute><PortalParceiro /></ParceiroRoute>} />
               <Route path="/parceiro/perfil" element={<ParceiroRoute><PerfilParceiro /></ParceiroRoute>} />
 

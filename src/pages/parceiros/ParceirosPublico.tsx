@@ -107,9 +107,9 @@ export default function ParceirosPublico() {
         <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-4 gap-3">
           {REGRAS_SIMPLES.map((r) => <div key={r.t} className="rounded-xl border border-white/10 bg-white/[0.03] p-4"><div className="font-semibold text-white text-sm">{r.t}</div><p className="text-xs text-slate-400 mt-1">{r.d}</p></div>)}
         </div>
-        <p className="text-xs text-slate-500 mt-3">Uma identidade, dois papéis: todo parceiro pode também ofertar serviços no <Link to="/marketplace" className="text-[#60ABEF] hover:underline">Marketplace YourEyes</Link>, e todo profissional do Marketplace pode virar parceiro.</p>
+        <p className="text-xs text-slate-500 mt-3">Uma identidade, dois papéis: todo parceiro pode também ofertar serviços no <Link to="/marketye" className="text-[#60ABEF] hover:underline">MarketYE</Link> (marketplace de serviços), e todo especialista do MarketYE pode virar parceiro.</p>
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-5 flex flex-wrap items-center gap-4 justify-between">
-          <div className="flex items-center gap-3"><Store className="w-6 h-6 text-[#FF8A00]" /><div><div className="font-semibold text-white">Já é profissional do Marketplace?</div><div className="text-sm text-slate-300">Entre com a mesma conta e conclua o cadastro de parceiro em um minuto.</div></div></div>
+          <div className="flex items-center gap-3"><Store className="w-6 h-6 text-[#FF8A00]" /><div><div className="font-semibold text-white">Já é especialista do MarketYE?</div><div className="text-sm text-slate-300">Entre com a mesma conta e conclua o cadastro de parceiro em um minuto.</div></div></div>
           <Link to="/parceiros/cadastro" className="inline-flex items-center gap-2 bg-[#FF8A00] hover:bg-[#e67a00] text-white font-semibold px-5 py-2.5 rounded-md transition">Virar parceiro <ArrowRight className="w-4 h-4" /></Link>
         </div>
       </section>

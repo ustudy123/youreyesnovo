@@ -31,7 +31,7 @@ interface ProfissionalFormModalProps {
 }
 
 export function ProfissionalFormModal({ open, onClose, onSuccess }: ProfissionalFormModalProps) {
-  const { user, tenantId } = useAuth();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [documents, setDocuments] = useState<UploadedDoc[]>([]);
   const [selfieFile, setSelfieFile] = useState<File | null>(null);
@@ -103,8 +103,8 @@ export function ProfissionalFormModal({ open, onClose, onSuccess }: Profissional
   };
 
   const handleSubmit = async () => {
-    if (!form.nome_completo || !form.email) {
-      toast.error("Preencha todos os campos obrigatórios");
+    if (!form.nome_completo || !form.email || !form.cpf_cnpj) {
+      toast.error("Preencha nome, e-mail e CPF/CNPJ");
       return;
     }
     if (!form.aceite_etica) {
@@ -139,33 +139,24 @@ export function ProfissionalFormModal({ open, onClose, onSuccess }: Profissional
       // Geocode city/state via Nominatim
       const geo = await geocodeCidade(form.cidade, form.estado);
 
-      const { data, error } = await supabase.from("marketplace_profissionais").insert({
-        user_id: user?.id || null,
-        tenant_id: tenantId,
-        nome_completo: form.nome_completo,
-        email: form.email,
-        telefone: form.telefone || null,
-        cpf_cnpj: form.cpf_cnpj || null,
-        bio: form.bio || null,
-        formacao_academica: form.formacao_academica || null,
-        registro_profissional: form.registro_profissional || null,
-        conselho: form.conselho || null,
-        uf_registro: form.uf_registro || null,
-        registro_validade: form.registro_validade || null,
-        certificacoes: form.certificacoes ? form.certificacoes.split(",").map((s) => s.trim()) : null,
-        especialidades: form.especialidades ? form.especialidades.split(",").map((s) => s.trim()) : null,
-        areas_atuacao: form.areas_atuacao ? form.areas_atuacao.split(",").map((s) => s.trim()) : null,
-        modalidades_atendimento: form.modalidades as ("presencial" | "online" | "hibrido")[],
-        cidade: form.cidade || null,
-        estado: form.estado || null,
-        latitude: geo?.lat ?? null,
-        longitude: geo?.lng ?? null,
-        aceite_codigo_etica: true,
-        aceite_codigo_etica_data: new Date().toISOString(),
-        tem_atestado_capacidade: documents.some((d) => d.categoria === "atestado_capacidade_tecnica"),
-        status: "ativo" as const,
-      }).select("id").single();
+      // Cadastro por função do sistema (RN-021): nasce pendente, com consentimento
+      // versionado, CPF/CNPJ validado e único. Nada de INSERT direto com status.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: cad, error } = await (supabase as any).rpc("marketye_cadastrar_especialista", {
+        _dados: {
+          nome_completo: form.nome_completo, email: form.email, telefone: form.telefone || null, cpf_cnpj: form.cpf_cnpj,
+          bio: form.bio || null, formacao_academica: form.formacao_academica || null, registro_profissional: form.registro_profissional || null,
+          conselho: form.conselho || null, uf_registro: form.uf_registro || null, registro_validade: form.registro_validade || null,
+          certificacoes: form.certificacoes ? form.certificacoes.split(",").map((s) => s.trim()).filter(Boolean) : [],
+          especialidades: form.especialidades ? form.especialidades.split(",").map((s) => s.trim()).filter(Boolean) : [],
+          areas_atuacao: form.areas_atuacao ? form.areas_atuacao.split(",").map((s) => s.trim()).filter(Boolean) : [],
+          modalidades: form.modalidades, cidade: form.cidade || null, estado: form.estado || null,
+          latitude: geo?.lat ?? null, longitude: geo?.lng ?? null, aceite_termos: true, user_agent: navigator.userAgent, origem: "sistema",
+        },
+      });
       if (error) throw error;
+      if (cad?.ja_existia) throw new Error("Esta conta já tem cadastro de especialista. Abra o portal em /marketye/portal.");
+      const data = { id: String(cad.id) };
 
       await uploadDocuments(data.id);
 
@@ -174,9 +165,10 @@ export function ProfissionalFormModal({ open, onClose, onSuccess }: Profissional
       const { error: photoUpError } = await supabase.storage.from("marketplace-docs").upload(photoPath, profilePhoto);
       if (photoUpError) throw new Error(`Erro ao enviar foto de perfil: ${photoUpError.message}`);
       const { data: photoUrl } = supabase.storage.from("marketplace-docs").getPublicUrl(photoPath);
-      await supabase.from("marketplace_profissionais").update({ foto_url: photoUrl.publicUrl }).eq("id", data.id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).rpc("marketye_meu_perfil_salvar", { _dados: { foto_url: photoUrl.publicUrl } });
 
-      toast.success("Cadastro enviado com documentos! Aguarde validação.");
+      toast.success("Cadastro enviado para verificação. Você acompanha tudo no seu portal de especialista.");
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -192,7 +184,7 @@ export function ProfissionalFormModal({ open, onClose, onSuccess }: Profissional
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
-            Cadastro de Profissional — Rede de Parceiros
+            Cadastro de Especialista — MarketYE
           </DialogTitle>
         </DialogHeader>
 
@@ -200,7 +192,7 @@ export function ProfissionalFormModal({ open, onClose, onSuccess }: Profissional
           {/* Info banner */}
           <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-800">
             <p className="font-medium mb-1">📌 Validação obrigatória</p>
-            <p>Seu perfil será analisado antes de ficar visível na Rede de Parceiros. É obrigatório enviar documentos comprobatórios e selfie de verificação. Profissionais com registro vencido são bloqueados automaticamente.</p>
+            <p>Seu perfil passa por verificação de dados antes de aparecer no MarketYE (o selo comunica dados verificados, não garantia de qualidade). Envie documentos comprobatórios e selfie. Registro profissional vencido tira o perfil da vitrine até a regularização.</p>
           </div>
 
           {/* Foto de Perfil */}
@@ -227,7 +219,7 @@ export function ProfissionalFormModal({ open, onClose, onSuccess }: Profissional
                 <Input value={form.telefone} onChange={(e) => updateField("telefone", e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>CPF/CNPJ</Label>
+                <Label>CPF/CNPJ *</Label>
                 <Input value={form.cpf_cnpj} onChange={(e) => updateField("cpf_cnpj", e.target.value)} />
               </div>
             </div>
