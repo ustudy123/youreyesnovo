@@ -186,6 +186,76 @@ async function semearFixturesProfundas(admin: Admin, userId: string) {
   if (aiErr) console.error("ai_context:", aiErr.message);
 }
 
+// Semeia 3 metas fictícias no tenant fixo da ilha — uma por nível relevante
+// (estratégica, setor, individual). Serve aos casos e2e "profundos" de Metas
+// (METAS-TELA-10/11/12), que precisam de metas JÁ EXISTENTES para conferir
+// listagem, filtro por nível e consolidação. Também sustenta o vazio-por-busca
+// de METAS-TELA-09 (com metas na base, buscar texto inexistente esvazia a lista).
+// Idempotente: só insere se o tenant ainda não tiver nenhuma meta. NÃO-FATAL.
+async function semearMetas(admin: Admin, userId: string) {
+  const { data: metaExist } = await admin
+    .from("metas").select("id").eq("tenant_id", TENANT_ID).limit(1);
+  if (metaExist && metaExist.length > 0) return; // já semeado — não duplica
+
+  // Departamento de RH para a meta de setor (setor_id -> departamentos).
+  const { data: deptRH } = await admin
+    .from("departamentos").select("id")
+    .eq("tenant_id", TENANT_ID).eq("nome", "Recursos Humanos").limit(1);
+  const setorId = deptRH && deptRH.length > 0 ? deptRH[0].id : null;
+
+  // Campos comuns às três metas. workflow_status 'ativa' e ano 2026 para
+  // aparecerem tanto na lista quanto na consolidação (que filtra pelo ano atual).
+  const comum = {
+    tenant_id: TENANT_ID,
+    empresa_id: EMPRESA_ID,
+    ano: 2026,
+    periodo: "trimestral",
+    trimestre: 1,
+    peso: 1,
+    data_inicio: "2026-01-01",
+    data_fim: "2026-12-31",
+    workflow_status: "ativa",
+    criado_por: userId,
+    criado_por_nome: "Robô de Testes",
+  };
+
+  const linhas = [
+    {
+      ...comum,
+      nivel: "estrategica",
+      titulo: "Reduzir índice de acidentes em 20% (QA)",
+      descricao: "Meta fictícia de QA — reduzir acidentes de trabalho no ano.",
+      status: "em_andamento",
+      progresso: 40,
+      responsavel_nome: "Robô de Testes",
+    },
+    {
+      ...comum,
+      nivel: "setor",
+      titulo: "Concluir treinamentos NR obrigatórios (QA)",
+      descricao: "Meta fictícia de QA — treinamentos NR do setor de RH.",
+      status: "em_andamento",
+      progresso: 60,
+      setor_id: setorId,
+      setor_nome: "Recursos Humanos",
+      departamento_id: setorId,
+      departamento_nome: "Recursos Humanos",
+    },
+    {
+      ...comum,
+      nivel: "individual",
+      titulo: "Registrar 100% dos EPIs entregues (QA)",
+      descricao: "Meta fictícia de QA — registro de entrega de EPIs.",
+      status: "nao_iniciada",
+      progresso: 0,
+      colaborador_nome: "Colaborador 1",
+    },
+  ];
+
+  const { error } = await admin.from("metas").insert(linhas);
+  if (error) console.error("metas (fixtures):", error.message);
+}
+
 const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -481,6 +551,14 @@ serve(async (req) => {
       await semearFixturesProfundas(admin, userId);
     } catch (e) {
       console.error("Fixtures profundas (nao-fatal):", (e as Error).message);
+    }
+
+    // 7b) Metas fictícias da ilha — habilitam os casos e2e profundos de Metas
+    //     (listagem, filtro por nível, consolidação). NÃO-FATAL, mesma razão.
+    try {
+      await semearMetas(admin, userId);
+    } catch (e) {
+      console.error("Metas (fixtures, nao-fatal):", (e as Error).message);
     }
 
     // 6) Robô-PARCEIRO: conta sem perfil de tenant, vinculada ao parceiro
