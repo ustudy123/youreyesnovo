@@ -25,6 +25,7 @@ do projeto de produção (`diayjpsrcerycycyaxst`).
 | 5 | `docs/script_13o_entrega4_provisao_rescisao_ferias.sql` | Provisão contábil, conciliação, 13º na rescisão e adiantamento nas férias |
 | 6 | `docs/script_13o_entrega5_esocial.sql` | S-1200 anual (indApuracao = 2) e S-1210, com validação prévia. **Não transmite** |
 | 7 | `docs/script_13o_testes_leva2_e_correcoes.sql` | 14 casos de teste novos (com base legal) e duas correções de lei na apuração: projeção do aviso prévio indenizado e acidente do trabalho |
+| 8 | `docs/script_13o_culpa_reciproca.sql` | O motivo de rescisão que faltava e a metade das verbas (CLT art. 484; Súmula 14 do TST) |
 
 ## O que esperar em cada conferência
 
@@ -37,6 +38,7 @@ do projeto de produção (`diayjpsrcerycycyaxst`).
 | 5 | 8 | todas **OK** |
 | 6 | 6 | todas **OK** |
 | 7 | 17 | todas **OK**; a última linha informa o total de casos documentados (31) |
+| 8 | 4 | todas **OK**. A última linha conta as rescisões por justa causa do último ano: se alguma foi, na verdade, culpa recíproca reconhecida, precisa ser revista à mão — o script vale do momento da aplicação em diante |
 
 Qualquer linha **FALTOU** significa que aquele item não foi criado — pare e
 mande a tabela inteira antes de seguir.
