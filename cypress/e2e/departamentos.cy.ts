@@ -48,4 +48,25 @@ describe("Módulo Departamentos", () => {
     cy.get('input[placeholder*="Buscar departamentos"]', { timeout: 20000 })
       .should("exist").type("Recursos");
   });
+
+  // DEPTO-TELA-04
+  it("mostra o seletor de estabelecimento/obra no formulário de Departamento", () => {
+    cy.contains("button", "Novo Departamento", { timeout: 20000 }).click({ force: true });
+    cy.get('[role="dialog"]', { timeout: 20000 }).should("be.visible");
+    cy.contains("Estabelecimento/Obra").should("be.visible");
+  });
+
+  // DEPTO-TELA-05
+  it("mostra os seletores de gestor titular e substituto", () => {
+    cy.contains("button", "Novo Departamento", { timeout: 20000 }).click({ force: true });
+    cy.get('[role="dialog"]', { timeout: 20000 }).should("be.visible");
+    cy.contains("Gestor responsável").should("be.visible");
+    cy.contains("Substituto do gestor").should("be.visible");
+  });
+
+  // DEPTO-TELA-06
+  it("mostra o estado vazio ao buscar um departamento inexistente", () => {
+    cy.get('input[placeholder*="Buscar departamentos"]', { timeout: 20000 }).type("zzz-depto-inexistente-999");
+    cy.contains("Nenhum departamento encontrado", { timeout: 20000 }).should("be.visible");
+  });
 });

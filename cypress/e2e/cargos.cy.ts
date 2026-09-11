@@ -49,4 +49,33 @@ describe("Módulo Cargos", () => {
     cy.get('input[placeholder*="Buscar cargos"]', { timeout: 20000 })
       .should("exist").type("Analista");
   });
+
+  // CARGO-TELA-03
+  it("abre a aba SST no formulário de Cargo", () => {
+    cy.contains("button", "Novo Cargo", { timeout: 20000 }).click({ force: true });
+    cy.get('[role="dialog"]', { timeout: 20000 }).should("be.visible");
+    cy.contains('[role="tab"]', "SST").click({ force: true });
+    cy.contains("Insalubridade", { timeout: 20000 }).should("be.visible");
+  });
+
+  // CARGO-TELA-04
+  it("mostra o seletor de departamentos no formulário de Cargo", () => {
+    cy.contains("button", "Novo Cargo", { timeout: 20000 }).click({ force: true });
+    cy.get('[role="dialog"]', { timeout: 20000 }).should("be.visible");
+    cy.contains("O primeiro selecionado será considerado").should("exist");
+  });
+
+  // CARGO-TELA-05
+  it("mostra os campos de faixa salarial no formulário de Cargo", () => {
+    cy.contains("button", "Novo Cargo", { timeout: 20000 }).click({ force: true });
+    cy.get('[role="dialog"]', { timeout: 20000 }).should("be.visible");
+    cy.contains("Salário Mínimo").should("be.visible");
+    cy.contains("Salário Máximo").should("be.visible");
+  });
+
+  // CARGO-TELA-07
+  it("mostra o estado vazio ao buscar um cargo inexistente", () => {
+    cy.get('input[placeholder*="Buscar cargos"]', { timeout: 20000 }).type("zzz-cargo-inexistente-999");
+    cy.contains("Nenhuma cargo encontrada", { timeout: 20000 }).should("be.visible");
+  });
 });

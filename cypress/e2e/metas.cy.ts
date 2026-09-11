@@ -71,4 +71,26 @@ describe("Módulo Metas", () => {
   it("abre a aba Assistente IA", () => {
     abrirAba("tab-metas-chat");
   });
+
+  // METAS-TELA-02
+  it("mostra os cards por nível na Visão Geral", () => {
+    abrirAba("tab-metas-dashboard");
+    ["Metas Estratégicas", "Metas por Unidade", "Metas por Setor", "Metas Individuais"].forEach((l) =>
+      cy.contains(l, { timeout: 20000 }).should("be.visible")
+    );
+  });
+
+  // METAS-TELA-07
+  it("abre o guia rápido do módulo de Metas", () => {
+    cy.contains("button", "Guia", { timeout: 20000 }).first().click({ force: true });
+    cy.get('[role="dialog"]', { timeout: 20000 })
+      .should("be.visible")
+      .and("contain.text", "Guia do Módulo de Metas");
+  });
+
+  // METAS-TELA-09
+  it("mostra o estado vazio em Minhas Metas", () => {
+    abrirAba("tab-metas-lista");
+    cy.contains("Nenhuma meta", { timeout: 20000 }).should("be.visible");
+  });
 });

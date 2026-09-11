@@ -70,4 +70,10 @@ describe("Módulo Prestadores / Terceiros", () => {
   it("abre a aba Dashboard", () => {
     abrirAba("Dashboard");
   });
+
+  // TERC-TELA-07
+  it("mostra o estado vazio orientando a cadastrar o primeiro terceiro", () => {
+    abrirAba("Terceiros");
+    cy.contains("Nenhum terceiro cadastrado", { timeout: 20000 }).should("be.visible");
+  });
 });
