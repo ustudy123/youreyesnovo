@@ -11,7 +11,7 @@ fora de propósito e como conferir no ambiente de teste.
 acesso e painel de QA passam a dizer **MarketYE**. "Parceiros" fica só para o
 Programa de Parceiros (canal de vendas).
 
-**Banco (migrations 20260911220000 / 221000 / 222000 / 224000; script de entrega
+**Banco (migrations 20260911220000 / 221000 / 222000 / 224000 / 230000; script de entrega
 `docs/script_marketye_fundacao.sql`).**
 
 | Requisito | Como ficou |
@@ -31,12 +31,14 @@ Programa de Parceiros (canal de vendas).
 | Trilha de autonomia (RN-031) | `marketplace_autonomia_eventos` por trigger em preço/política/horário. |
 | Léxico (RN-028) | Ocorrência, reflexo na visibilidade, ajuste de nível. Auditado pela rotina MKY-007. |
 | Taxonomia (7.1) | Categorias com slug, árvore, aliases, obrigação legal, exige registro, jurisdição. 20 subcategorias do beachhead SST/RH. |
-| Áreas abertas a todo tipo de prestador (decisão 11/09) | Raízes genéricas **Manutenção e instalações**, **Palestras e eventos**, **Consultoria e gestão**, **Saúde e bem-estar** e **Outros serviços**, com sinônimos para a busca em linguagem natural. Na tela a área é sugestão da IA, nunca obrigação: o prestador descreve o que faz em uma frase. |
+| Áreas abertas a todo tipo de prestador (decisão 11/09) | Raízes genéricas **Manutenção e instalações**, **Palestras e eventos**, **Consultoria e gestão**, **Saúde e bem-estar** e **Outros serviços**, com sinônimos para a busca em linguagem natural. Nas telas só aparecem as **áreas gerais** (as subáreas continuam no banco, para o encaixe com as obrigações legais e para a IA); a área é sugestão, nunca obrigação. |
+| Portal abre depois do cadastro mínimo (regressão 11/09) | `marketye_meu_portal` quebrava quando o cadastro não tinha especialidades (nulo medido como lista) e a tela ficava no círculo de carregamento. Função corrigida (migration 230000), tela com "Tentar de novo" e caso MKY-014 cobrindo. |
 | Localização (0.3) | `pais`/`moeda`/`jurisdicao` em especialista, anúncio, categorias e config. Nada de Brasil fixado em código; i18n ainda não. |
 
 **Telas.**
 
-- `/marketplace` — vitrine MarketYE (busca em linguagem natural com IA, filtros, ordenação por relevância, cards com selo "dados verificados", nível, saúde recente, Patrocinado rotulado, busca vazia com Avise-me); Minhas conversas (chat com mascaramento, liberar contato, serviço combinado, avaliar, Analisar com IA, Criar ação no Plano de Ação, arquivar proposta no módulo Documentos); Serviços contratados e Pacotes (legado). Para superadmin: **Aprovar cadastros**, **Denúncias**, **Pedidos de revisão**, **Destaques**, **Ajustes** (a antiga "Parâmetros": controles deslizantes com nome em linguagem comum e botão *Sugerir com IA*, que devolve os pesos a partir de um objetivo escrito em uma frase) e **Oferta e procura** (a antiga "Liquidez").
+- `/marketplace` — vitrine MarketYE (busca em linguagem natural com IA, filtros, ordenação por relevância, cards com selo "dados verificados", nível, saúde recente, Patrocinado rotulado, busca vazia com Avise-me); Minhas conversas (chat com mascaramento, liberar contato, serviço combinado, avaliar, Analisar com IA, Criar ação no Plano de Ação, arquivar proposta no módulo Documentos); Serviços contratados e Pacotes (legado). O superadmin vê a vitrine como uma empresa cliente; nada de administração aqui.
+- **Super Admin → aba MarketYE** (`/admin?aba=marketye`) — administração da casa: **Aprovar cadastros**, **Denúncias**, **Pedidos de revisão**, **Destaques**, **Ajustes** (a antiga "Parâmetros": controles deslizantes com nome em linguagem comum e botão *Sugerir com IA*, que devolve os pesos a partir de um objetivo escrito em uma frase) e **Oferta e procura** (a antiga "Liquidez").
 - `/marketye` — página pública de captação com "vagas de demanda" anonimizadas.
 - `/marketye/cadastro` — cadastro sem acesso ao sistema (Edge Function `marketye-cadastro`) ou com conta existente (papéis sobrepostos com o Programa de Parceiros). Formulário curto e sem jargão: nome, CPF/CNPJ, **"O que você faz para empresas?"** em texto livre (vira a apresentação), área opcional, registro profissional opcional em texto livre, cidade, telefone, como atende, e-mail e senha.
 - `/marketye/entrar` e `/marketye/portal` — portal restrito do especialista. Abre na aba **Meu caminho**: seis passos em sequência (conte o que faz → aprovação dos dados → cadastre o primeiro serviço → publique → responda às empresas → combine, faça o serviço e avalie), cada um com o botão que leva à ação e marcado como feito conforme avança. Demais abas: Meus serviços (anúncio montado pela IA a partir de uma frase, com "Mais opções" escondendo o resto), Conversas (resposta escrita com a IA), Minha reputação, Meu perfil (apresentação escrita com a IA), Cupons e Minha conta (termos, pedir revisão de uma decisão, baixar/apagar dados).
@@ -48,7 +50,7 @@ parâmetros, contestação, liquidez, sanção, pipeline): virou "conversa",
 "ocorrência". A IA (`ai-marketye`) atende qualquer serviço prestado a empresas,
 não só SST/RH.
 
-**QA.** Casos MKY-001 a MKY-013 (api, com rotinas) e MKY-020 a MKY-022 (e2e,
+**QA.** Casos MKY-001 a MKY-014 (api, com rotinas) e MKY-020 a MKY-022 (e2e,
 `cypress/e2e/marketye.cy.ts`); módulo `rede-parceiros` renomeado para MarketYE
 na Documentação de testes. Casos PARC-001/002/004/024 atualizados.
 
@@ -73,9 +75,10 @@ na Documentação de testes. Casos PARC-001/002/004/024 atualizados.
    "Segurança do Trabalho" (aparece "Especialista Staging (QA)"); busque
    "xyz" (aviso de oferta insuficiente + Avise-me); abra uma conversa.
 3. Sem login: `/marketye` (página pública) → "Quero me cadastrar".
-4. Superadmin: abas Aprovar cadastros, Pedidos de revisão, Ajustes (mova um
-   controle e salve; clique em *Sugerir com IA* com um objetivo como "quero
-   dar mais chance a quem está começando") e Oferta e procura.
+4. Superadmin: botão **Super Admin** → aba **MarketYE** → Aprovar cadastros,
+   Pedidos de revisão, Ajustes (mova um controle e salve; clique em *Sugerir
+   com IA* com um objetivo como "quero dar mais chance a quem está
+   começando") e Oferta e procura.
 5. Como especialista (`/marketye/entrar` com a conta do Especialista Staging):
    aba **Meu caminho** — siga os seis passos; em Meus serviços, escreva uma
    frase e clique em *Montar anúncio*.

@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 import {
   Building2, Users, Plus, Bug, Search, MoreVertical, Shield, TrendingUp, CheckCircle,
   UserPlus, Eye, Power, ArrowLeft, BookOpen, FileText, LayoutDashboard, Target,
-  Activity, MessageSquare, Brain, FileSignature, Rocket, Edit, Trash2, AlertTriangle, Loader2, CreditCard, Handshake,
+  Activity, MessageSquare, Brain, FileSignature, Rocket, Edit, Trash2, AlertTriangle, Loader2, CreditCard, Handshake, Store,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,12 +35,14 @@ import { PsicossocialSuperAdminPanel } from '@/components/admin/superadmin/Psico
 import { PrecosAddonsPanel } from '@/components/admin/superadmin/PrecosAddonsPanel';
 import { ParceirosPanel } from '@/components/admin/superadmin/ParceirosPanel';
 import { YourEyesEmpresaPanel } from '@/components/admin/superadmin/YourEyesEmpresaPanel';
+import { MarketYEAdminPanel } from '@/components/admin/superadmin/MarketYEAdminPanel';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 
 export default function SuperAdminDashboard() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { tenants, isLoading, createTenant, updateTenant, toggleTenant, deleteTenant, isCreatingTenant, isUpdatingTenant } = useSuperAdmin();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -144,8 +146,8 @@ export default function SuperAdminDashboard() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-3 md:grid-cols-10 w-full">
+        <Tabs defaultValue={searchParams.get('aba') ?? "overview"} className="space-y-6">
+          <TabsList className="grid grid-cols-3 md:grid-cols-11 w-full">
             <TabsTrigger value="overview"><LayoutDashboard className="w-4 h-4 mr-2" />Visão Geral</TabsTrigger>
             <TabsTrigger value="tenants"><Building2 className="w-4 h-4 mr-2" />Empresas</TabsTrigger>
             <TabsTrigger value="usuarios"><Users className="w-4 h-4 mr-2" />Usuários</TabsTrigger>
@@ -155,6 +157,7 @@ export default function SuperAdminDashboard() {
             <TabsTrigger value="situacao"><Activity className="w-4 h-4 mr-2" />Situação</TabsTrigger>
             <TabsTrigger value="precos"><CreditCard className="w-4 h-4 mr-2" />Preços</TabsTrigger>
             <TabsTrigger value="parceiros" data-testid="tab-parceiros"><Handshake className="w-4 h-4 mr-2" />Parceiros</TabsTrigger>
+            <TabsTrigger value="marketye" data-testid="tab-marketye"><Store className="w-4 h-4 mr-2" />MarketYE</TabsTrigger>
             <TabsTrigger value="empresa" data-testid="tab-empresa-ye"><Building2 className="w-4 h-4 mr-2" />Dados da YourEyes</TabsTrigger>
           </TabsList>
 
@@ -269,6 +272,8 @@ export default function SuperAdminDashboard() {
           <TabsContent value="precos"><PrecosAddonsPanel /></TabsContent>
 
           <TabsContent value="parceiros"><ParceirosPanel /></TabsContent>
+
+          <TabsContent value="marketye"><MarketYEAdminPanel /></TabsContent>
 
           <TabsContent value="empresa"><YourEyesEmpresaPanel /></TabsContent>
         </Tabs>
