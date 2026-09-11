@@ -40,6 +40,7 @@ ficou completo: o esperado é tudo **OK**, com no máximo uma linha
 | 6 | `docs/script_13o_entrega5_esocial.sql` | S-1200 anual (indApuracao = 2) e S-1210, com validação prévia. **Não transmite** |
 | 7 | `docs/script_13o_testes_leva2_e_correcoes.sql` | 14 casos de teste novos (com base legal) e duas correções de lei na apuração: projeção do aviso prévio indenizado e acidente do trabalho |
 | 8 | `docs/script_13o_culpa_reciproca.sql` | O motivo de rescisão que faltava e a metade das verbas (CLT art. 484; Súmula 14 do TST) |
+| 9 | `docs/script_13o_documentacao_testes.sql` | A Documentação de testes inteira: o módulo, os 31 casos e as rotinas que os executam |
 
 ## O que esperar em cada conferência
 
@@ -53,6 +54,13 @@ ficou completo: o esperado é tudo **OK**, com no máximo uma linha
 | 6 | 6 | todas **OK** |
 | 7 | 17 | todas **OK**; a última linha informa o total de casos documentados (31) |
 | 8 | 4 | todas **OK**. A última linha conta as rescisões por justa causa do último ano: se alguma foi, na verdade, culpa recíproca reconhecida, precisa ser revista à mão — o script vale do momento da aplicação em diante |
+| 9 | 5 | todas **OK**: módulo, 31 casos, 31 rotinas, 31 ligações e nenhum caso sem rotina |
+
+> **Por que a documentação de testes tem script próprio.** Ela nasceu por
+> migration, e migration só alcança o ambiente de teste. Nos demais ambientes a
+> conferência mostrava "documentados: 0" — os casos nunca tinham chegado lá. O
+> script 9 leva tudo, autossuficiente, e é independente do 7: as correções de lei
+> valem mesmo sem ele.
 
 Qualquer linha **FALTOU** significa que aquele item não foi criado — pare e
 mande a tabela inteira antes de seguir.
@@ -92,7 +100,8 @@ SELECT r.codigo, r.situacao, left(r.obtido, 160) AS resultado
  ORDER BY r.situacao, r.codigo;
 ```
 
-Esperado: **30 passaram e nenhuma falha**. O DEC13-023 sai como
+Esperado: **31 passaram e nenhuma falha** (30 quando as rubricas de adicional
+não estiverem cadastradas — aí o DEC13-023 sai como `nao_implementado`). O DEC13-023 sai como
 `nao_implementado` quando não há rubrica de adicional noturno, insalubridade ou
 periculosidade cadastrada — o caso avisa isso em vez de fingir que passou. Casos
 de nível tela também aparecem assim: eles rodam no Cypress, não no motor SQL.
