@@ -1,8 +1,22 @@
-# 13º Salário — roteiro de entrega em PRODUÇÃO
+# 13º Salário — roteiro de entrega: HOMOLOGAÇÃO e depois PRODUÇÃO
 
-Referência: YE-DP-13-001. Este roteiro cobre as cinco entregas do módulo.
-**Nada aqui roda sozinho**: cada passo é você colando um arquivo no SQL Editor
-do projeto de produção (`diayjpsrcerycycyaxst`).
+Referência: YE-DP-13-001. Este roteiro cobre o módulo inteiro.
+**Nada aqui roda sozinho**: cada passo é você colando um arquivo no SQL Editor.
+
+O fluxo é o da casa (decisão 09/2026), forward-only:
+
+1. **HOMOLOGAÇÃO** (`fgsblefvdabgdouipigz`) — cole os scripts na ordem e valide;
+2. **PRODUÇÃO** (`diayjpsrcerycycyaxst`) — cole **os mesmos arquivos**, na mesma
+   ordem. Nada é reescrito entre um ambiente e outro: o que a homologação
+   aprovou é literalmente o que a produção recebe.
+
+## Antes de tudo: o ambiente está em que pé?
+
+Cole `docs/script_13o_conferencia_ambiente.sql` (somente leitura) em qualquer um
+dos dois. Ele lista peça por peça e, no que faltar, **diz o nome do script a
+colar**. Use no começo, para saber de onde partir, e no fim, para confirmar que
+ficou completo: o esperado é tudo **OK**, com no máximo uma linha
+**INFORMATIVO** sobre o agendamento diário.
 
 ## Antes de começar
 
@@ -62,6 +76,28 @@ configurações duplicadas do 13º; ele **copia as linhas antes** para
 comentário final, o comando que devolve o que foi movido. Isso importa porque
 a produção não tem Point-in-Time Recovery: o resgate é cirúrgico, linha a
 linha, e não um retorno de backup do dia inteiro.
+
+## Depois dos oito: validar na homologação
+
+Antes de repetir tudo na produção, rode na homologação a bateria de testes do
+módulo — é ela que responde "o script aplicou e o módulo ficou de pé?":
+
+```sql
+WITH rodada AS (
+  SELECT qa_rodar_bateria('manual','financeiro/decimo-terceiro') AS id
+)
+SELECT r.codigo, r.situacao, left(r.obtido, 160) AS resultado
+  FROM qa_resultados r, rodada
+ WHERE r.execucao_id = rodada.id
+ ORDER BY r.situacao, r.codigo;
+```
+
+Esperado: **30 passaram e nenhuma falha**. O DEC13-023 sai como
+`nao_implementado` quando não há rubrica de adicional noturno, insalubridade ou
+periculosidade cadastrada — o caso avisa isso em vez de fingir que passou. Casos
+de nível tela também aparecem assim: eles rodam no Cypress, não no motor SQL.
+
+Só depois disso os mesmos oito arquivos vão para a produção.
 
 ## Depois dos scripts: publicar as telas
 
