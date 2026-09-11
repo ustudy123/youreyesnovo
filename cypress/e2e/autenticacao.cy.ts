@@ -31,7 +31,11 @@ describe("Autenticação (/login)", () => {
     cy.get('input[autocomplete="current-password"]').should("exist");
     cy.contains("button", /^Entrar$/).should("exist");
     cy.contains("a", "Esqueceu a senha?").should("exist");
-    cy.contains("Cadastre sua empresa").should("exist");
+    // A porta livre de cadastro tem chave (SuperAdmin → YourEyes/Empresas):
+    // aberta, a tela oferece "Cadastre sua empresa"; fechada — o padrão hoje —
+    // ela manda para os planos. As duas são estados válidos da mesma tela, e o
+    // que o caso AUTH-001 cobra é que o convite exista, não qual dos dois é.
+    cy.contains(/Cadastre sua empresa|Conheça os planos e contrate/).should("exist");
   });
 
   // AUTH-004
