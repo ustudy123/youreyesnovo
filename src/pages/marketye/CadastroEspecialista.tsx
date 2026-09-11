@@ -116,7 +116,7 @@ export default function CadastroEspecialista() {
           <div><Label className="text-slate-300">Área mais próxima (opcional)</Label>
             <Select value={f.categoria_slug || "nenhuma"} onValueChange={(v) => set("categoria_slug", v === "nenhuma" ? "" : v)}>
               <SelectTrigger className={inputCls}><SelectValue placeholder="Se quiser" /></SelectTrigger>
-              <SelectContent><SelectItem value="nenhuma">Prefiro não escolher agora</SelectItem>{(publico?.categorias ?? []).map((c) => [<SelectItem key={c.id} value={c.slug}>{c.nome}</SelectItem>, ...c.filhas.map((s) => <SelectItem key={s.id} value={s.slug}>&nbsp;&nbsp;— {s.nome}</SelectItem>)])}</SelectContent>
+              <SelectContent><SelectItem value="nenhuma">Prefiro não escolher agora</SelectItem>{(publico?.categorias ?? []).map((c) => <SelectItem key={c.id} value={c.slug}>{c.nome}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div><Label className="text-slate-300">Registro profissional, se a sua área tiver (opcional)</Label><Input className={inputCls} value={f.registro} onChange={(e) => set("registro", e.target.value)} placeholder="Ex.: CREA 12345-PR · CRP 06/1234 · CRC PR-012345" /></div>

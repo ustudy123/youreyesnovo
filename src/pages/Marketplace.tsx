@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, Store, MessageSquare, History, ShieldCheck, Gavel, SlidersHorizontal, BarChart3, Megaphone, ShieldAlert, Locate, Sparkles, Bell, X, Loader2, UserPlus, Package } from "lucide-react";
+import { Search, Store, MessageSquare, History, Locate, Sparkles, Bell, X, Loader2, UserPlus, Package, Shield, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,11 +20,8 @@ import { ContratacoesList } from "@/components/marketplace/ContratacoesList";
 import { ConfirmacaoExecucaoModal } from "@/components/marketplace/ConfirmacaoExecucaoModal";
 import { AvaliacaoModal } from "@/components/marketplace/AvaliacaoModal";
 import { DenunciaForm } from "@/components/marketplace/DenunciaForm";
-import { DenunciasList } from "@/components/marketplace/DenunciasList";
 import { PacotesServicos } from "@/components/marketplace/PacotesServicos";
 import { ProfissionalFormModal } from "@/components/marketplace/ProfissionalFormModal";
-import { ModeracaoPanel } from "@/components/marketplace/ModeracaoPanel";
-import { ContestacoesPanel, ParametrosPanel, LiquidezPanel, DestaquesPanel } from "@/components/marketplace/GovernancaPanel";
 
 const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const RELAX_LABEL: Record<string, string> = { raio: "ampliamos o raio", cidade: "incluímos outras cidades", modalidade: "incluímos atendimento remoto", uf: "incluímos outros estados", nota_min: "relaxamos a nota mínima" };
@@ -77,7 +74,7 @@ export default function Marketplace() {
     if (!busca.trim()) return;
     setInterpretando(true);
     try {
-      const r = await marketyeIA<{ categoria_slug?: string; modalidade?: string; uf?: string; cidade?: string; termos?: string; somente_remoto?: boolean; obrigacoes?: string[] }>("interpretar_busca", { texto: busca, categorias: (cats?.todas ?? []).map((c) => ({ slug: c.slug, nome: c.nome, obrigacao_legal: c.obrigacao_legal })) });
+      const r = await marketyeIA<{ categoria_slug?: string; modalidade?: string; uf?: string; cidade?: string; termos?: string; somente_remoto?: boolean; obrigacoes?: string[] }>("interpretar_busca", { texto: busca, categorias: (cats?.raizes ?? []).map((c) => ({ slug: c.slug, nome: c.nome, obrigacao_legal: c.obrigacao_legal })) });
       setFiltros((f) => ({ ...f, q: r.termos || undefined, categoria_slug: r.categoria_slug || f.categoria_slug, modalidade: r.modalidade || f.modalidade, uf: r.uf || f.uf, cidade: r.cidade || f.cidade, somente_remoto: r.somente_remoto ?? f.somente_remoto, obrigacoes: r.obrigacoes?.length ? r.obrigacoes : f.obrigacoes }));
       toast.success("Entendi o pedido e apliquei os filtros.");
     } catch (e) { toast.error(e instanceof Error ? e.message : "A IA não respondeu"); aplicarBusca(); } finally { setInterpretando(false); }
@@ -129,22 +126,17 @@ export default function Marketplace() {
         </div>
       </motion.div>
 
+      {isSuperAdmin && (
+        <div className="mb-3 text-xs text-muted-foreground flex items-center gap-2" data-testid="marketye-aviso-admin">
+          <Shield className="h-3.5 w-3.5" />Aqui você vê o MarketYE como uma empresa cliente. A administração (aprovar cadastros, denúncias, ajustes) fica em <Link to="/admin?aba=marketye" className="underline underline-offset-2 font-medium">Super Admin → MarketYE</Link>.
+        </div>
+      )}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap">
           <TabsTrigger value="vitrine" className="gap-1.5"><Search className="h-4 w-4" /> Encontrar especialista</TabsTrigger>
           <TabsTrigger value="conversas" className="gap-1.5" data-testid="aba-conversas"><MessageSquare className="h-4 w-4" /> Minhas conversas</TabsTrigger>
           <TabsTrigger value="contratacoes" className="gap-1.5"><History className="h-4 w-4" /> Serviços contratados</TabsTrigger>
           <TabsTrigger value="pacotes" className="gap-1.5"><Package className="h-4 w-4" /> Pacotes</TabsTrigger>
-          {isSuperAdmin && (
-            <>
-              <TabsTrigger value="moderacao" className="gap-1.5"><ShieldCheck className="h-4 w-4" /> Aprovar cadastros</TabsTrigger>
-              <TabsTrigger value="denuncias" className="gap-1.5"><ShieldAlert className="h-4 w-4" /> Denúncias</TabsTrigger>
-              <TabsTrigger value="contestacoes" className="gap-1.5"><Gavel className="h-4 w-4" /> Pedidos de revisão</TabsTrigger>
-              <TabsTrigger value="destaques" className="gap-1.5"><Megaphone className="h-4 w-4" /> Destaques</TabsTrigger>
-              <TabsTrigger value="parametros" className="gap-1.5"><SlidersHorizontal className="h-4 w-4" /> Ajustes</TabsTrigger>
-              <TabsTrigger value="liquidez" className="gap-1.5"><BarChart3 className="h-4 w-4" /> Oferta e procura</TabsTrigger>
-            </>
-          )}
         </TabsList>
 
         <TabsContent value="vitrine" className="mt-4 space-y-4">
@@ -163,10 +155,8 @@ export default function Marketplace() {
               <SelectTrigger className="w-[220px]" data-testid="filtro-categoria"><SelectValue placeholder="Área" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todas as áreas</SelectItem>
-                {(cats?.raizes ?? []).map((r) => [
-                  <SelectItem key={r.id} value={r.slug ?? r.id}>{r.nome}</SelectItem>,
-                  ...(r.filhas ?? []).map((f) => <SelectItem key={f.id} value={f.slug ?? f.id}>&nbsp;&nbsp;— {f.nome}</SelectItem>),
-                ])}
+                {(cats?.raizes ?? []).map((r) => <SelectItem key={r.id} value={r.slug ?? r.id}>{r.nome}</SelectItem>)}
+                {categoriaAtual?.pai_id && <SelectItem value={categoriaAtual.slug ?? categoriaAtual.id}>{categoriaAtual.nome}</SelectItem>}
               </SelectContent>
             </Select>
             <Select value={filtros.modalidade ?? "todos"} onValueChange={(v) => set("modalidade", v)}>
@@ -242,16 +232,6 @@ export default function Marketplace() {
         <TabsContent value="conversas" className="mt-4"><ConversasLeads /></TabsContent>
         <TabsContent value="contratacoes" className="mt-4"><ContratacoesList contratacoes={contratacoes} onConfirmarExecucao={setContratacaoParaConfirmar} onAvaliar={setContratacaoParaAvaliar} /></TabsContent>
         <TabsContent value="pacotes" className="mt-4"><PacotesServicos /></TabsContent>
-        {isSuperAdmin && (
-          <>
-            <TabsContent value="moderacao" className="mt-4"><ModeracaoPanel ativo={activeTab === "moderacao"} /></TabsContent>
-            <TabsContent value="denuncias" className="mt-4"><DenunciasList /></TabsContent>
-            <TabsContent value="contestacoes" className="mt-4"><ContestacoesPanel ativo={activeTab === "contestacoes"} /></TabsContent>
-            <TabsContent value="destaques" className="mt-4"><DestaquesPanel ativo={activeTab === "destaques"} /></TabsContent>
-            <TabsContent value="parametros" className="mt-4"><ParametrosPanel ativo={activeTab === "parametros"} /></TabsContent>
-            <TabsContent value="liquidez" className="mt-4"><LiquidezPanel ativo={activeTab === "liquidez"} /></TabsContent>
-          </>
-        )}
       </Tabs>
 
       <div className="mt-6 rounded-xl border border-dashed p-4 flex flex-wrap items-center justify-between gap-3" data-testid="marketplace-convite-parceiro">

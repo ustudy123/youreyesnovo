@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Loader2, Sparkles, Star, MessageSquare, FileText, Activity, ShieldCheck, Gavel, Ticket, Download, Trash2, Send, Eye, PauseCircle, PlayCircle, Pencil, CheckCircle2, AlertTriangle, Clock, Phone, Mail, Building2, Circle, ArrowRight, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -38,7 +38,22 @@ export default function PortalEspecialista() {
   const [excluirAberto, setExcluirAberto] = useState(false);
   const [novoServico, setNovoServico] = useState(false);
 
-  if (portal.isLoading || !d) {
+  if (portal.isError) {
+    // Nunca deixar a pessoa olhando um círculo girando: o cadastro dela está
+    // guardado; o que falhou foi a leitura do portal.
+    return (
+      <MarketYELayout titulo="Meu portal">
+        <div className="max-w-lg mx-auto text-center py-16 space-y-4" data-testid="portal-erro">
+          <AlertTriangle className="w-10 h-10 mx-auto text-amber-400" />
+          <h1 className="text-xl font-bold text-white">Não conseguimos abrir o seu portal agora</h1>
+          <p className="text-sm text-slate-300">Seu cadastro está guardado. Tente de novo em instantes; se continuar, fale com a gente em contato@youreyes.com.br.</p>
+          <Button className="bg-[#FF8A00] hover:bg-[#e67a00] text-white" onClick={() => portal.refetch()}>Tentar de novo</Button>
+        </div>
+      </MarketYELayout>
+    );
+  }
+  if (portal.isSuccess && d === null) return <Navigate to="/marketye/cadastro" replace />;
+  if (!d) {
     return <MarketYELayout titulo="Meu portal"><div className="py-20 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-[#60ABEF]" /></div></MarketYELayout>;
   }
   const st = statusPerfil[d.perfil.status] ?? statusPerfil.pendente;
@@ -225,9 +240,10 @@ function AnuncioEditor({ anuncio, onClose }: { anuncio: PortalAnuncio | null; on
     try {
       const r = await marketyeIA<{ titulo: string; descricao: string; tags: string[]; categoria_slug?: string; tipo_preco?: string; preco_sugerido?: number; preco_minimo?: number; preco_maximo?: number; justificativa_preco?: string; base_legal?: string; publico_alvo?: string }>("gerar_anuncio", {
         o_que_faz: ia.oque || f.nome, categoria: cat?.nome, conselho: portal.data?.perfil.conselho, cidade: portal.data?.perfil.cidade, uf: portal.data?.perfil.estado, modalidade: f.modalidade,
-        categorias: (cats?.todas ?? []).map((c) => ({ slug: c.slug, nome: c.nome, obrigacao_legal: c.obrigacao_legal })),
+        categorias: (cats?.raizes ?? []).map((c) => ({ slug: c.slug, nome: c.nome, obrigacao_legal: c.obrigacao_legal })),
       });
-      const catSug = r.categoria_slug ? cats?.todas.find((c) => c.slug === r.categoria_slug) : undefined;
+      const catBruta = r.categoria_slug ? cats?.todas.find((c) => c.slug === r.categoria_slug) : undefined;
+      const catSug = catBruta?.pai_id ? cats?.todas.find((c) => c.id === catBruta.pai_id) : catBruta;
       setF((x) => ({
         ...x, nome: r.titulo || x.nome, descricao: r.descricao || x.descricao, tags: (r.tags ?? []).join(", ") || x.tags, categoria_id: x.categoria_id || catSug?.id || "",
         tipo_preco: r.tipo_preco || x.tipo_preco, preco_referencia: r.preco_sugerido != null ? String(r.preco_sugerido) : x.preco_referencia,
@@ -275,7 +291,7 @@ function AnuncioEditor({ anuncio, onClose }: { anuncio: PortalAnuncio | null; on
             <div className="sm:col-span-2"><Label>Descrição* (sem telefone, e-mail ou site; o contato é por aqui)</Label><Textarea rows={5} value={f.descricao} onChange={(e) => set("descricao", e.target.value)} placeholder="O que a empresa recebe, como funciona, para quem serve." /></div>
             <div><Label>Área (opcional, ajuda a empresa a encontrar você)</Label>
               <Select value={f.categoria_id || "nenhuma"} onValueChange={(v) => set("categoria_id", v === "nenhuma" ? "" : v)}><SelectTrigger><SelectValue placeholder="Escolha, se quiser" /></SelectTrigger>
-                <SelectContent><SelectItem value="nenhuma">Sem área definida</SelectItem>{(cats?.raizes ?? []).map((r) => [<SelectItem key={r.id} value={r.id}>{r.nome}</SelectItem>, ...(r.filhas ?? []).map((c) => <SelectItem key={c.id} value={c.id}>&nbsp;&nbsp;— {c.nome}{c.exige_registro ? " (pede registro profissional)" : ""}</SelectItem>)])}</SelectContent>
+                <SelectContent><SelectItem value="nenhuma">Sem área definida</SelectItem>{(cats?.raizes ?? []).map((r) => <SelectItem key={r.id} value={r.id}>{r.nome}</SelectItem>)}{cat?.pai_id && <SelectItem value={cat.id}>{cat.nome}</SelectItem>}</SelectContent>
               </Select>
               {cat?.obrigacao_legal?.length ? <p className="text-[11px] text-muted-foreground mt-1">Esta área atende {cat.obrigacao_legal.join(", ")}: as empresas com essa pendência veem você primeiro.</p> : null}
             </div>
@@ -487,7 +503,7 @@ function PerfilTab({ d }: { d: PortalDados }) {
     if (!oque.trim() && !f.bio) return toast.error("Conte em uma frase o que você faz");
     setGerando(true);
     try {
-      const r = await marketyeIA<{ bio: string; especialidades: string[] }>("gerar_bio", { o_que_faz: oque || f.bio, registro: f.conselho ? `${f.conselho} ${f.registro_profissional}` : null, cidade: f.cidade, uf: f.estado, categorias: (cats?.todas ?? []).map((c) => ({ slug: c.slug, nome: c.nome })) });
+      const r = await marketyeIA<{ bio: string; especialidades: string[] }>("gerar_bio", { o_que_faz: oque || f.bio, registro: f.conselho ? `${f.conselho} ${f.registro_profissional}` : null, cidade: f.cidade, uf: f.estado, categorias: (cats?.raizes ?? []).map((c) => ({ slug: c.slug, nome: c.nome })) });
       setF((x) => ({ ...x, bio: r.bio || x.bio, especialidades: x.especialidades || (r.especialidades ?? []).join(", ") }));
       toast.success("Apresentação escrita. Ajuste o que quiser e salve.");
     } catch (e) { toast.error(e instanceof Error ? e.message : "A IA não respondeu"); } finally { setGerando(false); }
