@@ -46,8 +46,8 @@ export function MarketYELayout({ children, titulo }: { children: React.ReactNode
       </header>
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">{children}</main>
       <footer className="max-w-6xl mx-auto px-6 py-8 text-xs text-slate-500 border-t border-white/10">
-        YourEyes · MarketYE · o YourEyes conecta empresas a especialistas; a execução do serviço é do especialista. Selos comunicam verificação de dados, não garantia de qualidade.{" "}
-        <Link to="/termos-de-uso" className="hover:text-white underline underline-offset-2">Termos de Uso</Link> · <Link to="/politica-de-privacidade" className="hover:text-white underline underline-offset-2">Privacidade</Link> · Atendimento a usuários e não-usuários: <a href="mailto:contato@youreyes.com.br" className="hover:text-white">contato@youreyes.com.br</a>
+        YourEyes · MarketYE · o YourEyes faz o encontro entre empresas e especialistas; quem faz o serviço é o especialista. O selo diz que os dados foram conferidos, não que o serviço é garantido.{" "}
+        <Link to="/termos-de-uso" className="hover:text-white underline underline-offset-2">Termos de Uso</Link> · <Link to="/politica-de-privacidade" className="hover:text-white underline underline-offset-2">Privacidade</Link> · Fale com a gente: <a href="mailto:contato@youreyes.com.br" className="hover:text-white">contato@youreyes.com.br</a>
       </footer>
     </div>
   );

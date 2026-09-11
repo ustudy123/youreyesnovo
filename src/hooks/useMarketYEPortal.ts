@@ -236,7 +236,7 @@ export function usePortalMensagens(leadId: string | null) {
 
 // Geração assistida por IA (anúncio a partir de poucos campos, preço sugerido,
 // rascunho de resposta a lead, interpretação de busca em linguagem natural).
-export async function marketyeIA<T = Record<string, unknown>>(tipo: "gerar_anuncio" | "sugerir_preco" | "rascunho_resposta" | "interpretar_busca" | "resumo_avaliacoes", dados: Record<string, unknown>): Promise<T> {
+export async function marketyeIA<T = Record<string, unknown>>(tipo: "gerar_anuncio" | "sugerir_preco" | "rascunho_resposta" | "interpretar_busca" | "resumo_avaliacoes" | "sugerir_parametros" | "gerar_bio", dados: Record<string, unknown>): Promise<T> {
   const { data, error } = await supabase.functions.invoke("ai-marketye", { body: { tipo, dados } });
   if (error) {
     const ctx = (error as { context?: Response }).context;

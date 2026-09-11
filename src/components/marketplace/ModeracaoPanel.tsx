@@ -55,7 +55,7 @@ export function ModeracaoPanel({ ativo }: { ativo: boolean }) {
             </div>
             {p.moderacao_motivo && <p className="text-xs text-muted-foreground">Motivo anterior: {p.moderacao_motivo}</p>}
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => { setSel(p); setMotivo(""); setSelo(true); setRejeitando(false); }}><Eye className="h-3.5 w-3.5 mr-1" />Analisar</Button>
+              <Button size="sm" variant="outline" onClick={() => { setSel(p); setMotivo(""); setSelo(true); setRejeitando(false); }}><Eye className="h-3.5 w-3.5 mr-1" />Ver cadastro</Button>
               {p.status === "suspenso" && <Button size="sm" variant="outline" className="text-emerald-700" onClick={() => situacao.mutate({ id: p.id, situacao: "ativo", motivo: "Reativado pela moderação" })}><PlayCircle className="h-3.5 w-3.5 mr-1" />Reativar</Button>}
             </div>
           </div>
@@ -68,11 +68,11 @@ export function ModeracaoPanel({ ativo }: { ativo: boolean }) {
     <div className="space-y-6">
       <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-800 flex gap-2">
         <Shield className="h-4 w-4 mt-0.5 shrink-0" />
-        <p>Moderação com pessoa decidindo. Aprovar liga o selo <b>"dados verificados"</b> (nunca "qualidade garantida"). Rejeitar exige motivo, porque o especialista pode contestar pelo canal único.</p>
+        <p>Aqui você confere os dados e documentos de quem se cadastrou e decide se pode aparecer para as empresas. Aprovar liga o selo <b>"dados verificados"</b> (o selo diz que os dados conferem, não que o serviço é garantido). Para não aprovar é preciso escrever o motivo: o especialista lê e pode pedir revisão.</p>
       </div>
       <section>
-        <h3 className="font-semibold mb-2">Fila de verificação ({pendentes.length})</h3>
-        {fila.isLoading ? <p className="text-sm text-muted-foreground">Carregando...</p> : <Lista itens={pendentes} vazio="Nenhum cadastro aguardando verificação." />}
+        <h3 className="font-semibold mb-2">Aguardando aprovação ({pendentes.length})</h3>
+        {fila.isLoading ? <p className="text-sm text-muted-foreground">Carregando...</p> : <Lista itens={pendentes} vazio="Nenhum cadastro aguardando aprovação." />}
       </section>
       <section>
         <h3 className="font-semibold mb-2">Suspensos ({listaSuspensos.length})</h3>
@@ -106,25 +106,25 @@ export function ModeracaoPanel({ ativo }: { ativo: boolean }) {
                   )}
                 </div>
                 <div>
-                  <p className="font-medium mb-1">Consentimentos</p>
+                  <p className="font-medium mb-1">Termos aceitos</p>
                   <ul className="text-xs text-muted-foreground">{sel.consentimentos.map((c, i) => <li key={i}>{c.tipo} · versão {c.versao} · {format(new Date(c.aceito_em), "dd/MM/yyyy HH:mm")}</li>)}</ul>
                 </div>
                 {sel.status === "pendente" && (
                   <div className="space-y-3 border-t pt-3">
-                    <div className="flex items-center gap-2"><Checkbox id="selo" checked={selo} onCheckedChange={(v) => setSelo(!!v)} /><label htmlFor="selo" className="text-xs">Documentos e registro conferidos: ligar o selo "dados verificados"</label></div>
+                    <div className="flex items-center gap-2"><Checkbox id="selo" checked={selo} onCheckedChange={(v) => setSelo(!!v)} /><label htmlFor="selo" className="text-xs">Conferi os documentos e o registro: mostrar o selo "dados verificados"</label></div>
                     {rejeitando && (
-                      <div className="space-y-1"><Label>Motivo da rejeição (vai para o especialista)</Label><Textarea value={motivo} onChange={(e) => setMotivo(e.target.value)} rows={3} /></div>
+                      <div className="space-y-1"><Label>Explique o motivo (o especialista vai ler)</Label><Textarea value={motivo} onChange={(e) => setMotivo(e.target.value)} rows={3} /></div>
                     )}
                     <div className="flex gap-2 justify-end">
                       {!rejeitando ? (
                         <>
-                          <Button variant="outline" className="text-red-600" onClick={() => setRejeitando(true)}><XCircle className="h-4 w-4 mr-1" />Rejeitar</Button>
+                          <Button variant="outline" className="text-red-600" onClick={() => setRejeitando(true)}><XCircle className="h-4 w-4 mr-1" />Não aprovar</Button>
                           <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={moderar.isPending} onClick={() => moderar.mutate({ id: sel.id, resultado: "aprovado", selo }, { onSuccess: () => setSel(null) })}><CheckCircle2 className="h-4 w-4 mr-1" />Aprovar</Button>
                         </>
                       ) : (
                         <>
                           <Button variant="ghost" onClick={() => setRejeitando(false)}>Voltar</Button>
-                          <Button variant="destructive" disabled={moderar.isPending || motivo.trim().length < 5} onClick={() => moderar.mutate({ id: sel.id, resultado: "rejeitado", motivo, selo: false }, { onSuccess: () => setSel(null) })}>Confirmar rejeição</Button>
+                          <Button variant="destructive" disabled={moderar.isPending || motivo.trim().length < 5} onClick={() => moderar.mutate({ id: sel.id, resultado: "rejeitado", motivo, selo: false }, { onSuccess: () => setSel(null) })}>Confirmar</Button>
                         </>
                       )}
                     </div>

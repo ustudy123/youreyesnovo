@@ -28,17 +28,17 @@ export function useMarketYEPublico() {
 }
 
 const PASSOS = [
-  { t: "1. Cadastre-se em minutos", d: "Nome, CPF/CNPJ, área e região. Sem ser cliente do YourEyes. Documentos e registro entram depois, no seu portal." },
-  { t: "2. Verificação de dados", d: "A equipe confere identidade e registro profissional. O selo comunica dados verificados — a qualidade do serviço é sua." },
-  { t: "3. Anúncio com ajuda da IA", d: "Três campos viram título, descrição, tags e faixa de preço sugerida. Você edita e publica." },
-  { t: "4. Leads das empresas", d: "As empresas encontram você pela obrigação legal que precisam cumprir. A conversa fica registrada; o combinado é seu." },
+  { t: "1. Cadastre-se em minutos", d: "Nome, CPF ou CNPJ, o que você faz e onde atende. Não precisa ser cliente do YourEyes." },
+  { t: "2. Conferimos seus dados", d: "A equipe confere identidade e, quando a área exige, o registro profissional. Você ganha o selo de dados verificados." },
+  { t: "3. Descreva seu serviço", d: "Uma frase sobre o que você faz vira um anúncio pronto, com sugestão de preço. Você revisa e publica." },
+  { t: "4. As empresas entram em contato", d: "As empresas encontram você pelo que precisam resolver. A conversa acontece aqui; preço e combinado são seus." },
 ];
 
 const GARANTIAS = [
-  { icon: Scale, t: "Você define preço, horário e política", d: "O YourEyes não fixa preço nem jornada. Pode atender fora daqui e em outras plataformas. Recusar um lead não pesa contra você." },
-  { icon: ShieldCheck, t: "Reputação em dois eixos, sem punição", d: "Saúde recente (90 dias) e nível por desempenho. Níveis só afetam visibilidade, nunca sua capacidade de trabalhar." },
-  { icon: TrendingUp, t: "Proteção ao novato", d: "Nos primeiros 30 dias você recebe impulso de exploração para conseguir as primeiras avaliações." },
-  { icon: MessageSquare, t: "Canal único de contestação", d: "Qualquer decisão sobre seu perfil pode ser contestada; quem decide é uma pessoa, com trilha registrada." },
+  { icon: Scale, t: "Preço, horário e regras são seus", d: "O YourEyes não fixa preço nem horário. Você pode atender fora daqui e em outras plataformas, e recusar um contato não pesa contra você." },
+  { icon: ShieldCheck, t: "Reputação justa, sem punição", d: "As empresas veem como anda seu atendimento e o nível que você construiu. Isso só muda sua posição na vitrine, nunca seu direito de trabalhar." },
+  { icon: TrendingUp, t: "Boas-vindas a quem está começando", d: "Nos primeiros 30 dias seus serviços ganham um empurrão na vitrine para você conseguir as primeiras avaliações." },
+  { icon: MessageSquare, t: "Discordou? Peça revisão", d: "Qualquer decisão sobre o seu perfil pode ser revista: uma pessoa da equipe lê, decide e responde a você." },
 ];
 
 export default function MarketYEPublico() {
@@ -52,7 +52,7 @@ export default function MarketYEPublico() {
             Acesse <span className="text-[#FF8A00]">{data?.empresas_faixa ?? "centenas de"} empresas</span> que precisam do seu serviço.
           </h1>
           <p className="text-slate-300 text-lg">
-            Médicos e engenheiros do trabalho, técnicos de segurança, ergonomistas, psicólogos, contadores, advogados trabalhistas e consultores de RH: as empresas clientes do YourEyes já têm a obrigação legal e o prazo. Falta o especialista. Pode ser você.
+            Treinamentos, palestras, consultorias, contabilidade, saúde e segurança do trabalho, fisioterapia, manutenção, tecnologia... Se você presta algum serviço para empresas, as empresas clientes do YourEyes estão aqui procurando. Pode ser você.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button asChild size="lg" className="bg-[#FF8A00] hover:bg-[#e67a00] text-white"><Link to="/marketye/cadastro" data-testid="marketye-cta-cadastro">Quero me cadastrar <ArrowRight className="w-4 h-4 ml-1" /></Link></Button>
@@ -60,13 +60,13 @@ export default function MarketYEPublico() {
           </div>
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3"><div className="text-2xl font-bold text-white">{data?.empresas_faixa ?? "—"}</div><div className="text-[11px] text-slate-400">empresas clientes</div></div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3"><div className="text-2xl font-bold text-white">{data?.categorias?.length ?? "—"}</div><div className="text-[11px] text-slate-400">áreas de serviço</div></div>
+            <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3"><div className="text-2xl font-bold text-white">{data?.categorias?.length ?? "—"}</div><div className="text-[11px] text-slate-400">áreas (e qualquer outra)</div></div>
             <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3"><div className="text-2xl font-bold text-white">{data?.especialistas_ativos ?? "—"}</div><div className="text-[11px] text-slate-400">especialistas ativos</div></div>
           </div>
         </div>
         <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 space-y-4">
           <h2 className="font-semibold text-white flex items-center gap-2"><Bell className="w-4 h-4 text-[#FF8A00]" />Vagas de demanda abertas</h2>
-          <p className="text-xs text-slate-400">Empresas que procuraram e não encontraram oferta suficiente nos últimos 30 dias. Só mostramos células com 5 ou mais empresas: nenhuma empresa é identificável.</p>
+          <p className="text-xs text-slate-400">Áreas em que empresas procuraram nos últimos 30 dias e encontraram poucos especialistas. Só mostramos quando há 5 ou mais empresas, para ninguém ser identificado.</p>
           {data && data.vagas_demanda.length > 0 ? (
             <ul className="space-y-2" data-testid="marketye-vagas">
               {data.vagas_demanda.slice(0, 8).map((v, i) => (
@@ -77,7 +77,7 @@ export default function MarketYEPublico() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-300">Ainda estamos coletando os primeiros sinais. As áreas abaixo já têm demanda instalada nas empresas clientes.</p>
+            <p className="text-sm text-slate-300">Ainda estamos juntando os primeiros dados. As áreas abaixo já são procuradas pelas empresas.</p>
           )}
           <div className="flex flex-wrap gap-1.5">
             {(data?.categorias ?? []).slice(0, 10).map((c) => <span key={c.id} className="text-[11px] rounded-full border border-white/15 px-2 py-0.5 text-slate-300">{c.nome}</span>)}
@@ -106,7 +106,7 @@ export default function MarketYEPublico() {
       </section>
 
       <section className="py-8">
-        <h2 className="text-2xl font-bold text-white">Áreas com demanda instalada</h2>
+        <h2 className="text-2xl font-bold text-white">Algumas áreas que as empresas procuram (vale qualquer outra)</h2>
         <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {(data?.categorias ?? []).map((c) => (
             <div key={c.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
@@ -123,7 +123,7 @@ export default function MarketYEPublico() {
         <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#12315a] to-[#0B1D34] p-8 flex flex-wrap items-center justify-between gap-4">
           <div className="max-w-xl">
             <h3 className="text-xl font-bold text-white flex items-center gap-2"><Sparkles className="w-5 h-5 text-[#FF8A00]" />Primeira aparição garantida</h3>
-            <p className="text-sm text-slate-300 mt-1">Publicou, apareceu: nos primeiros 30 dias seu anúncio ganha impulso de exploração para você conseguir as primeiras conversas e avaliações.</p>
+            <p className="text-sm text-slate-300 mt-1">Publicou, apareceu: nos primeiros 30 dias seus serviços ganham um empurrão na vitrine para você conseguir as primeiras conversas e avaliações.</p>
             <p className="text-xs text-slate-500 mt-2 flex items-center gap-1"><MapPin className="w-3 h-3" />Atende presencial, remoto ou os dois: você escolhe e muda quando quiser.</p>
           </div>
           <Button asChild size="lg" className="bg-[#FF8A00] hover:bg-[#e67a00] text-white"><Link to="/marketye/cadastro">Cadastrar agora <ArrowRight className="w-4 h-4 ml-1" /></Link></Button>

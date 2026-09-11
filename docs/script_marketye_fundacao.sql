@@ -9,7 +9,7 @@
 -- Cole no SQL Editor do projeto. Roda em UMA transação; pode ser executado
 -- mais de uma vez (colunas IF NOT EXISTS, políticas recriadas, funções
 -- CREATE OR REPLACE, seeds com ON CONFLICT). É o mesmo conteúdo das
--- migrations 20260911220000, 20260911221000 e 20260911222000 (a de
+-- migrations 20260911220000, 221000, 222000 e 224000 (a de
 -- mobiliário da ilha de teste NÃO entra: é dado fictício do ambiente de teste).
 --
 -- O QUE MUDA EM DADO EXISTENTE (sem apagar nada): serviços ativos ganham
@@ -761,6 +761,7 @@ END $marketye_trilha_autonomia_perfil$;
 DROP TRIGGER IF EXISTS marketye_trilha_autonomia_perfil ON public.marketplace_profissionais;
 CREATE TRIGGER marketye_trilha_autonomia_perfil AFTER UPDATE ON public.marketplace_profissionais
   FOR EACH ROW EXECUTE FUNCTION public.marketye_trilha_autonomia_perfil();
+
 
 -- ---------------------------------------------------------------------
 -- 2) FUNÇÕES DO MÓDULO
@@ -1893,6 +1894,7 @@ INSERT INTO public.marketplace_reputacao (profissional_id)
 SELECT id FROM public.marketplace_profissionais p WHERE NOT EXISTS (SELECT 1 FROM public.marketplace_reputacao r WHERE r.profissional_id = p.id)
 ON CONFLICT (profissional_id) DO NOTHING;
 
+
 -- ---------------------------------------------------------------------
 -- 3) QA: casos MKY-* e rotinas
 -- ---------------------------------------------------------------------
@@ -2672,6 +2674,50 @@ ON CONFLICT (codigo) DO NOTHING;
 
 
 -- ---------------------------------------------------------------------
+-- 4) ÁREAS ABERTAS A TODO TIPO DE PRESTADOR (sem rótulos fixos)
+-- ---------------------------------------------------------------------
+-- =====================================================================
+-- MARKETYE · ÁREAS ABERTAS A TODO TIPO DE PRESTADOR
+--
+-- Decisão do dono do produto (11/09/2026): o MarketYE é para qualquer
+-- serviço prestado a empresas — treinamentos, consultorias, palestras,
+-- contabilidade, fisioterapia, manutenção... — sem prender o prestador a
+-- rótulos fixos. A árvore de áreas continua existindo (ela alimenta o
+-- encaixe com as obrigações legais das empresas), mas passa a ter raízes
+-- genéricas para o que não é SST/RH e uma raiz "Outros serviços" que
+-- acolhe qualquer coisa. Na tela, a área é sugestão, nunca obrigação: o
+-- prestador descreve o que faz em uma frase e a IA sugere a área.
+--
+-- Idempotente: só INSERT com WHERE NOT EXISTS por slug.
+-- =====================================================================
+
+
+INSERT INTO public.marketplace_categorias (nome, descricao, icone, ordem, ativo, slug, obrigacao_legal, exige_registro, conselhos_aceitos, aliases)
+SELECT v.nome, v.descricao, v.icone, v.ordem, true, v.slug, '{}'::text[], false, '{}'::text[], v.aliases
+FROM (VALUES
+  ('Manutenção e instalações', 'Manutenção predial, elétrica, ar-condicionado, equipamentos e instalações', 'Wrench', 30, 'manutencao-instalacoes',
+   ARRAY['manutencao','manutenção','ar-condicionado','eletrica','elétrica','hidraulica','predial','instalacao','instalação','reforma','equipamentos','limpeza']),
+  ('Palestras e eventos', 'Palestras, workshops, SIPAT, dinâmicas e eventos corporativos', 'Mic', 31, 'palestras-eventos',
+   ARRAY['palestra','palestrante','evento','sipat','workshop','dinamica','dinâmica','motivacional','semana']),
+  ('Consultoria e gestão', 'Consultoria empresarial, processos, qualidade, ESG e gestão', 'Compass', 32, 'consultoria-gestao',
+   ARRAY['consultoria','consultor','gestao','gestão','processos','qualidade','iso','esg','lean','planejamento']),
+  ('Saúde e bem-estar', 'Nutrição, fisioterapia, psicologia clínica, atividade física e bem-estar no trabalho', 'HeartHandshake', 33, 'saude-bem-estar',
+   ARRAY['nutricao','nutrição','nutricionista','fisioterapeuta','bem-estar','massagem','quick massage','yoga','meditacao','meditação','qualidade de vida']),
+  ('Outros serviços', 'Qualquer outro serviço prestado a empresas', 'Sparkles', 99, 'outros-servicos',
+   ARRAY['outros','diversos','geral'])
+) AS v(nome, descricao, icone, ordem, slug, aliases)
+WHERE NOT EXISTS (SELECT 1 FROM public.marketplace_categorias c WHERE c.slug = v.slug);
+
+-- Sinônimos que ajudam a busca em linguagem natural a cair na raiz certa.
+UPDATE public.marketplace_categorias SET aliases = aliases || ARRAY['curso','capacitacao','capacitação','instrutor','treinamento in company']
+WHERE slug = 'treinamentos' AND NOT ('instrutor' = ANY(aliases));
+UPDATE public.marketplace_categorias SET aliases = aliases || ARRAY['contador','escritorio contabil','escritório contábil','fiscal','folha de pagamento']
+WHERE slug = 'contabil-fiscal' AND NOT ('contador' = ANY(aliases));
+UPDATE public.marketplace_categorias SET aliases = aliases || ARRAY['desenvolvimento de sistemas','suporte','infraestrutura','lgpd tecnica','seguranca da informacao']
+WHERE slug = 'tecnologia' AND NOT ('suporte' = ANY(aliases));
+
+
+-- ---------------------------------------------------------------------
 -- CONFERÊNCIA (único resultado exibido pelo editor)
 -- ---------------------------------------------------------------------
 WITH f AS MATERIALIZED (
@@ -2689,6 +2735,7 @@ WITH f AS MATERIALIZED (
          EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'marketplace_servicos' AND column_name = 'status') AS coluna_status_anuncio,
          (SELECT count(*) FROM public.marketplace_config WHERE vigente) AS parametros_vigentes,
          (SELECT count(*) FROM public.marketplace_categorias WHERE pai_id IS NOT NULL) AS subcategorias,
+         (SELECT count(*) FROM public.marketplace_categorias WHERE pai_id IS NULL AND slug IN ('manutencao-instalacoes','palestras-eventos','consultoria-gestao','saude-bem-estar','outros-servicos')) AS areas_abertas,
          NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'marketplace_profissionais' AND policyname = 'Admins manage all professionals') AS politica_antiga_removida,
          NOT EXISTS (SELECT 1 FROM information_schema.column_privileges WHERE table_name = 'marketplace_profissionais' AND grantee = 'authenticated' AND privilege_type = 'SELECT' AND column_name IN ('email','telefone','cpf_cnpj')) AS pii_fechada,
          (SELECT count(*) FROM public.qa_casos_teste WHERE codigo LIKE 'MKY-%') AS casos_qa,
@@ -2703,10 +2750,10 @@ WITH f AS MATERIALIZED (
   FROM q
 )
 SELECT CASE WHEN f.buscar = 1 AND f.cadastro = 1 AND f.avaliar = 1 AND f.portal = 1 AND f.vitrine_publica = 1 AND f.contestacao = 1 AND f.antiga_com_pii = 0
-             AND c.tabela_leads AND c.coluna_consentimento AND c.coluna_status_anuncio AND c.parametros_vigentes >= 11 AND c.subcategorias >= 20
+             AND c.tabela_leads AND c.coluna_consentimento AND c.coluna_status_anuncio AND c.parametros_vigentes >= 11 AND c.subcategorias >= 20 AND c.areas_abertas = 5
              AND c.politica_antiga_removida AND c.pii_fechada AND c.casos_qa >= 16 AND qr.passaram = qr.total
             THEN 'OK' ELSE 'REVISAR' END AS resultado,
        f.buscar, f.cadastro, f.avaliar, f.portal, f.vitrine_publica, f.contestacao, f.antiga_com_pii,
-       c.tabela_leads, c.coluna_consentimento, c.coluna_status_anuncio, c.parametros_vigentes, c.subcategorias, c.politica_antiga_removida, c.pii_fechada,
+       c.tabela_leads, c.coluna_consentimento, c.coluna_status_anuncio, c.parametros_vigentes, c.subcategorias, c.areas_abertas, c.politica_antiga_removida, c.pii_fechada,
        c.casos_qa, c.modulo_qa, qr.passaram || '/' || qr.total AS qa_mky, qr.detalhes AS erro_tecnico
 FROM f, c, qr;
