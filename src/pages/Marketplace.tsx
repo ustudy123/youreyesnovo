@@ -115,34 +115,34 @@ export default function Marketplace() {
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30"><Store className="h-6 w-6" /></div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent" data-testid="marketye-titulo">MarketYE</h1>
-              <p className="text-indigo-300/80 text-sm">Marketplace de serviços: especialistas verificados para as obrigações da sua empresa</p>
+              <p className="text-indigo-300/80 text-sm">Encontre quem presta serviço para a sua empresa: treinamentos, consultorias, saúde, segurança, contabilidade, manutenção e mais</p>
             </div>
           </div>
           <p className="text-sm text-indigo-200/60 mt-3 max-w-2xl">
-            O YourEyes conecta sua empresa a especialistas em SST, saúde ocupacional, RH e áreas afins. A busca é ordenada pelo que faz sentido para o seu perfil e pelas obrigações que você precisa cumprir; a conversa fica registrada e você avalia depois. O serviço é do especialista.
+            Escreva o que você precisa, escolha um especialista e converse por aqui. A lista é ordenada pelo que faz mais sentido para a sua empresa; a conversa fica registrada e, quando o serviço estiver combinado, você avalia. Quem faz o serviço é o especialista; o YourEyes faz o encontro.
           </p>
           <div className="flex gap-2 mt-4 flex-wrap">
             {!especialistaId && <Button size="sm" onClick={() => setShowProfissionalForm(true)} className="bg-white/10 text-white border border-white/20 hover:bg-white/20"><UserPlus className="h-4 w-4 mr-1.5" />Sou especialista: quero me cadastrar</Button>}
             {especialistaId && <Button asChild size="sm" className="bg-white/10 text-white border border-white/20 hover:bg-white/20"><a href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/marketye/portal`}>Meu portal de especialista</a></Button>}
-            <Button asChild size="sm" variant="ghost" className="text-indigo-200 hover:text-white hover:bg-white/10"><a href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/marketye`} target="_blank" rel="noreferrer">Página pública do MarketYE</a></Button>
+            <Button asChild size="sm" variant="ghost" className="text-indigo-200 hover:text-white hover:bg-white/10"><a href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/marketye`} target="_blank" rel="noreferrer">Conheço um especialista: indicar o MarketYE</a></Button>
           </div>
         </div>
       </motion.div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap">
-          <TabsTrigger value="vitrine" className="gap-1.5"><Search className="h-4 w-4" /> Vitrine</TabsTrigger>
+          <TabsTrigger value="vitrine" className="gap-1.5"><Search className="h-4 w-4" /> Encontrar especialista</TabsTrigger>
           <TabsTrigger value="conversas" className="gap-1.5" data-testid="aba-conversas"><MessageSquare className="h-4 w-4" /> Minhas conversas</TabsTrigger>
-          <TabsTrigger value="contratacoes" className="gap-1.5"><History className="h-4 w-4" /> Contratações</TabsTrigger>
+          <TabsTrigger value="contratacoes" className="gap-1.5"><History className="h-4 w-4" /> Serviços contratados</TabsTrigger>
           <TabsTrigger value="pacotes" className="gap-1.5"><Package className="h-4 w-4" /> Pacotes</TabsTrigger>
           {isSuperAdmin && (
             <>
-              <TabsTrigger value="moderacao" className="gap-1.5"><ShieldCheck className="h-4 w-4" /> Moderação</TabsTrigger>
+              <TabsTrigger value="moderacao" className="gap-1.5"><ShieldCheck className="h-4 w-4" /> Aprovar cadastros</TabsTrigger>
               <TabsTrigger value="denuncias" className="gap-1.5"><ShieldAlert className="h-4 w-4" /> Denúncias</TabsTrigger>
-              <TabsTrigger value="contestacoes" className="gap-1.5"><Gavel className="h-4 w-4" /> Contestações</TabsTrigger>
+              <TabsTrigger value="contestacoes" className="gap-1.5"><Gavel className="h-4 w-4" /> Pedidos de revisão</TabsTrigger>
               <TabsTrigger value="destaques" className="gap-1.5"><Megaphone className="h-4 w-4" /> Destaques</TabsTrigger>
-              <TabsTrigger value="parametros" className="gap-1.5"><SlidersHorizontal className="h-4 w-4" /> Parâmetros</TabsTrigger>
-              <TabsTrigger value="liquidez" className="gap-1.5"><BarChart3 className="h-4 w-4" /> Liquidez</TabsTrigger>
+              <TabsTrigger value="parametros" className="gap-1.5"><SlidersHorizontal className="h-4 w-4" /> Ajustes</TabsTrigger>
+              <TabsTrigger value="liquidez" className="gap-1.5"><BarChart3 className="h-4 w-4" /> Oferta e procura</TabsTrigger>
             </>
           )}
         </TabsList>
@@ -151,7 +151,7 @@ export default function Marketplace() {
           <div className="flex gap-2 flex-wrap">
             <div className="relative flex-1 min-w-[240px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder='Diga o que precisa: "preciso de alguém pra fazer o laudo de ruído"' value={busca} onChange={(e) => setBusca(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") aplicarBusca(); }} className="pl-10" data-testid="marketye-busca" />
+              <Input placeholder='Diga o que precisa: "preciso de um treinamento de NR-35" ou "manutenção de ar-condicionado"' value={busca} onChange={(e) => setBusca(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") aplicarBusca(); }} className="pl-10" data-testid="marketye-busca" />
             </div>
             <Button variant="outline" onClick={aplicarBusca} data-testid="marketye-buscar">Buscar</Button>
             <Button variant="outline" onClick={interpretarIA} disabled={interpretando || !busca.trim()} title="A IA traduz o pedido em categoria e filtros">{interpretando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}<span className="ml-1.5 hidden sm:inline">Entender com IA</span></Button>
@@ -160,9 +160,9 @@ export default function Marketplace() {
 
           <div className="flex gap-2 flex-wrap items-center" data-testid="marketye-filtros">
             <Select value={filtros.categoria_slug ?? categoriaAtual?.slug ?? "todos"} onValueChange={(v) => { set("categoria_id", undefined); set("categoria_slug", v); }}>
-              <SelectTrigger className="w-[220px]" data-testid="filtro-categoria"><SelectValue placeholder="Categoria" /></SelectTrigger>
+              <SelectTrigger className="w-[220px]" data-testid="filtro-categoria"><SelectValue placeholder="Área" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="todos">Todas as categorias</SelectItem>
+                <SelectItem value="todos">Todas as áreas</SelectItem>
                 {(cats?.raizes ?? []).map((r) => [
                   <SelectItem key={r.id} value={r.slug ?? r.id}>{r.nome}</SelectItem>,
                   ...(r.filhas ?? []).map((f) => <SelectItem key={f.id} value={f.slug ?? f.id}>&nbsp;&nbsp;— {f.nome}</SelectItem>),
@@ -182,10 +182,10 @@ export default function Marketplace() {
               <SelectContent><SelectItem value="todos">Qualquer nota</SelectItem><SelectItem value="4.5">4,5+</SelectItem><SelectItem value="4">4,0+</SelectItem><SelectItem value="3.5">3,5+</SelectItem></SelectContent>
             </Select>
             <Select value={filtros.nivel_min ?? "todos"} onValueChange={(v) => set("nivel_min", v)}>
-              <SelectTrigger className="w-[150px]"><SelectValue placeholder="Nível" /></SelectTrigger>
-              <SelectContent><SelectItem value="todos">Qualquer nível</SelectItem><SelectItem value="bronze">Bronze+</SelectItem><SelectItem value="prata">Prata+</SelectItem><SelectItem value="ouro">Ouro+</SelectItem><SelectItem value="top">Especialista Top</SelectItem></SelectContent>
+              <SelectTrigger className="w-[170px]"><SelectValue placeholder="Experiência" /></SelectTrigger>
+              <SelectContent><SelectItem value="todos">Qualquer experiência aqui</SelectItem><SelectItem value="bronze">Bronze ou mais</SelectItem><SelectItem value="prata">Prata ou mais</SelectItem><SelectItem value="ouro">Ouro ou mais</SelectItem><SelectItem value="top">Só Especialista Top</SelectItem></SelectContent>
             </Select>
-            <Button variant={filtros.selo ? "default" : "outline"} size="sm" onClick={() => set("selo", !filtros.selo)}><ShieldCheck className="h-4 w-4 mr-1" />Só verificados</Button>
+            <Button variant={filtros.selo ? "default" : "outline"} size="sm" onClick={() => set("selo", !filtros.selo)}><ShieldCheck className="h-4 w-4 mr-1" />Só com dados verificados</Button>
             <Button variant={filtros.somente_remoto ? "default" : "outline"} size="sm" onClick={() => set("somente_remoto", !filtros.somente_remoto)}>Atende remoto</Button>
             <Input type="number" placeholder="Preço máx." className="w-[120px]" value={filtros.preco_max ?? ""} onChange={(e) => set("preco_max", e.target.value ? Number(e.target.value) : undefined)} />
             {(Object.keys(filtros).length > 0 || busca) && <Button variant="ghost" size="sm" onClick={limpar}><X className="h-4 w-4 mr-1" />Limpar</Button>}
@@ -210,21 +210,21 @@ export default function Marketplace() {
             <div className="rounded-2xl border border-dashed p-8 text-center space-y-3" data-testid="marketye-vazio">
               <Store className="h-12 w-12 mx-auto text-muted-foreground/30" />
               <p className="font-medium">Ainda não temos {categoriaAtual ? categoriaAtual.nome : "essa oferta"}{filtros.uf ? ` em ${filtros.uf}` : ""} com esses filtros.</p>
-              <p className="text-sm text-muted-foreground">Sua busca já virou um sinal para captarmos especialistas dessa área. Quer ser avisado quando houver?</p>
+              <p className="text-sm text-muted-foreground">Sua busca já nos avisou que falta gente nessa área. Quer receber um aviso quando alguém entrar?</p>
               <div className="flex gap-2 justify-center flex-wrap">
                 <Button variant="outline" onClick={pedirAviso} disabled={avisoPedido || !tenantId} data-testid="marketye-avise-me"><Bell className="h-4 w-4 mr-1.5" />{avisoPedido ? "Aviso registrado" : "Avise-me quando houver"}</Button>
                 {!filtros.somente_remoto && <Button variant="outline" onClick={() => setFiltros((f) => ({ ...f, somente_remoto: true, uf: undefined, ignorar_uf_padrao: true, cidade: undefined }))}>Ver quem atende remoto</Button>}
                 {(filtros.categoria_slug || filtros.categoria_id) && <Button variant="ghost" onClick={() => { set("categoria_slug", undefined); set("categoria_id", undefined); }}>Ver todas as categorias</Button>}
               </div>
               {resultado && resultado.categorias_adjacentes.length > 0 && (
-                <div className="text-xs text-muted-foreground">Categorias próximas: {resultado.categorias_adjacentes.map((c) => <Button key={c.id} variant="link" size="sm" className="h-auto p-0 px-1 text-xs" onClick={() => set("categoria_slug", c.slug)}>{c.nome}</Button>)}</div>
+                <div className="text-xs text-muted-foreground">Áreas parecidas: {resultado.categorias_adjacentes.map((c) => <Button key={c.id} variant="link" size="sm" className="h-auto p-0 px-1 text-xs" onClick={() => set("categoria_slug", c.slug)}>{c.nome}</Button>)}</div>
               )}
             </div>
           ) : (
             <>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{resultado?.total} anúncio(s) · ordenados por relevância para a sua empresa{isFetching ? " · atualizando..." : ""}</span>
-                {resultado?.oferta_insuficiente && <Badge variant="outline" className="text-[10px]">oferta ainda rala aqui</Badge>}
+                <span>{resultado?.total} serviço(s) · os mais indicados para a sua empresa primeiro{isFetching ? " · atualizando..." : ""}</span>
+                {resultado?.oferta_insuficiente && <Badge variant="outline" className="text-[10px]">ainda temos poucos especialistas nesta área</Badge>}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="marketye-resultados">
                 {resultados.map((a) => <AnuncioCard key={a.servico_id} anuncio={a} onContatar={setAnuncioSel} onDenunciar={(id, nome) => setDenunciaTarget({ id, nome })} />)}

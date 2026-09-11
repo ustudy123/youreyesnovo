@@ -140,9 +140,9 @@ export interface MarketYEMensagem {
 }
 
 export const NIVEL_LABEL: Record<string, string> = { novo: "Novo", bronze: "Bronze", prata: "Prata", ouro: "Ouro", top: "Especialista Top" };
-export const SAUDE_LABEL: Record<string, string> = { verde: "Saúde recente ótima", amarelo: "Saúde recente atenção", vermelho: "Saúde recente baixa", cinza: "Sem dados recentes" };
+export const SAUDE_LABEL: Record<string, string> = { verde: "Atendimento em dia", amarelo: "Atendimento pede atenção", vermelho: "Atendimento precisa melhorar", cinza: "Ainda sem histórico" };
 export const LEAD_STATUS_LABEL: Record<string, string> = {
-  novo: "Aguardando resposta", respondido: "Em conversa", qualificado: "Contato liberado", ganho: "Serviço combinado", perdido: "Sem contratação", encerrado: "Encerrada",
+  novo: "Aguardando resposta", respondido: "Em conversa", qualificado: "Contato liberado", ganho: "Serviço combinado", perdido: "Não fechou", encerrado: "Encerrada",
 };
 
 export function formatarPreco(a: Pick<MarketYEAnuncio, "preco_referencia" | "tipo_preco" | "preco_minimo" | "preco_maximo" | "moeda">): string {
@@ -294,6 +294,15 @@ export function useMarketYEModeracao(ativo: boolean) {
   const contestacoes = useQuery({ queryKey: ["marketye-contestacoes"], queryFn: () => rpc("marketye_contestacoes_fila"), enabled: ativo });
   const painel = useQuery({ queryKey: ["marketye-painel"], queryFn: () => rpc("marketye_painel_liquidez"), enabled: ativo });
   const transparencia = useQuery({ queryKey: ["marketye-transparencia"], queryFn: () => rpc("marketye_transparencia", { p_ano: null }), enabled: ativo });
+  const especialistasAtivos = useQuery({
+    queryKey: ["marketye-especialistas-ativos"],
+    queryFn: async () => {
+      const { data, error } = await sb.from("marketplace_profissionais").select("id, nome_completo, cidade, estado").eq("status", "ativo").order("nome_completo");
+      if (error) throw error;
+      return (data ?? []) as { id: string; nome_completo: string; cidade: string | null; estado: string | null }[];
+    },
+    enabled: ativo,
+  });
   const config = useQuery({
     queryKey: ["marketye-config"],
     queryFn: async () => {
@@ -337,5 +346,5 @@ export function useMarketYEModeracao(ativo: boolean) {
     onError: (e) => toast.error(extrairErro(e)),
   });
 
-  return { fila, suspensos, contestacoes, painel, transparencia, config, moderar, situacao, decidirContestacao, decidirDenuncia, criarDestaque, salvarConfig };
+  return { fila, suspensos, contestacoes, painel, transparencia, config, especialistasAtivos, moderar, situacao, decidirContestacao, decidirDenuncia, criarDestaque, salvarConfig };
 }

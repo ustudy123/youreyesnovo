@@ -36,7 +36,7 @@ export function AnuncioCard({ anuncio, onContatar, onDenunciar }: AnuncioCardPro
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             {anuncio.patrocinado && (
-              <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wide font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 mb-1" title="Posição paga, rotulada de forma transparente. Não altera a nota nem o piso de qualidade.">
+              <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wide font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 mb-1" title="Este especialista pagou por uma posição extra. Isso não muda a nota dele nem passa por cima da nota mínima.">
                 <Megaphone className="h-3 w-3" /> Patrocinado
               </span>
             )}
@@ -76,7 +76,7 @@ export function AnuncioCard({ anuncio, onContatar, onDenunciar }: AnuncioCardPro
               {p.selo_verificado && (
                 <Tooltip>
                   <TooltipTrigger asChild><BadgeCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" /></TooltipTrigger>
-                  <TooltipContent>Dados e registro verificados pelo YourEyes. Não é garantia de qualidade do serviço.</TooltipContent>
+                  <TooltipContent>A equipe do YourEyes conferiu os dados e o registro deste especialista. Não é uma garantia sobre o serviço.</TooltipContent>
                 </Tooltip>
               )}
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${nivelCor[p.nivel] ?? nivelCor.novo}`}>{NIVEL_LABEL[p.nivel] ?? p.nivel}</span>
@@ -87,7 +87,7 @@ export function AnuncioCard({ anuncio, onContatar, onDenunciar }: AnuncioCardPro
               <span className="inline-flex items-center gap-0.5"><Star className="h-3 w-3 text-amber-400 fill-amber-400" />{p.total_avaliacoes > 0 ? `${Number(p.nota_media).toFixed(1)} (${p.total_avaliacoes})` : "sem avaliações"}</span>
               <Tooltip>
                 <TooltipTrigger asChild><span className="inline-flex items-center gap-1"><span className={`inline-block w-2 h-2 rounded-full ${saudeCor[p.saude_cor] ?? saudeCor.cinza}`} /><Activity className="h-3 w-3" /></span></TooltipTrigger>
-                <TooltipContent>{SAUDE_LABEL[p.saude_cor] ?? "Saúde recente"} (últimos 90 dias)</TooltipContent>
+                <TooltipContent>{SAUDE_LABEL[p.saude_cor] ?? "Atendimento"} (últimos 90 dias: responde rápido, não cancela)</TooltipContent>
               </Tooltip>
               {p.clientes_unicos > 0 && <span className="inline-flex items-center gap-0.5"><Users className="h-3 w-3" />{p.clientes_unicos} empresas</span>}
             </div>

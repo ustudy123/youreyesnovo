@@ -12,9 +12,9 @@ const corsHeaders = {
 };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
-type Tipo = "gerar_anuncio" | "sugerir_preco" | "interpretar_busca" | "rascunho_resposta" | "resumo_avaliacoes";
+type Tipo = "gerar_anuncio" | "sugerir_preco" | "interpretar_busca" | "rascunho_resposta" | "resumo_avaliacoes" | "sugerir_parametros" | "gerar_bio";
 
-const SISTEMA = `Você é a IA do MarketYE, marketplace de serviços profissionais (SST, saúde ocupacional, RH, jurídico trabalhista, contábil) da plataforma YourEyes, no Brasil.
+const SISTEMA = `Você é a IA do MarketYE, marketplace de serviços para empresas da plataforma YourEyes, no Brasil. Cabe qualquer serviço prestado a empresas: SST, saúde ocupacional, RH, jurídico, contábil, treinamentos, palestras, consultoria, tecnologia, manutenção, bem-estar e outros.
 Regras invioláveis: escreva em português do Brasil; nunca invente registros profissionais, números de telefone, e-mails ou links; nunca inclua contato direto em textos de anúncio (o contato acontece pela plataforma); não prometa "qualidade garantida" nem fale em nome do YourEyes como prestador; o preço é sempre uma sugestão — quem define é o profissional; use linguagem não disciplinar (nada de punição, sanção, infração, demoção).`;
 
 function ferramenta(tipo: Tipo) {
@@ -65,6 +65,33 @@ function ferramenta(tipo: Tipo) {
       return { name: "registrar_resposta", description: "Rascunho de resposta do especialista", parameters: { type: "object", properties: { resposta: { type: "string", description: "resposta cordial e objetiva, com perguntas de escopo, prazo típico e próximos passos; sem telefone/e-mail" } }, required: ["resposta"] } };
     case "resumo_avaliacoes":
       return { name: "registrar_resumo", description: "Resumo em prós/contras", parameters: { type: "object", properties: { resumo: { type: "string", description: "texto curto com pontos fortes, ressalvas e o que falta combinar" } }, required: ["resumo"] } };
+    case "sugerir_parametros":
+      return {
+        name: "registrar_pesos",
+        description: "Pesos da ordenação da vitrine (somam 100) e explicação simples",
+        parameters: {
+          type: "object",
+          properties: {
+            pesos: { type: "object", properties: { fit: { type: "number" }, reputacao: { type: "number" }, saude: { type: "number" }, proximidade: { type: "number" }, exploracao: { type: "number" }, preco: { type: "number" }, destaque: { type: "number" } }, required: ["fit", "reputacao", "saude", "proximidade", "exploracao", "preco", "destaque"] },
+            explicacao: { type: "string", description: "2 a 3 frases, em linguagem simples, dizendo o que muda na vitrine com esses pesos" },
+          },
+          required: ["pesos", "explicacao"],
+        },
+      };
+    case "gerar_bio":
+      return {
+        name: "registrar_bio",
+        description: "Apresentação do especialista e palavras-chave",
+        parameters: {
+          type: "object",
+          properties: {
+            bio: { type: "string", description: "apresentação em primeira pessoa, 300 a 600 caracteres, sem contato direto, sem promessas de garantia" },
+            especialidades: { type: "array", items: { type: "string" }, description: "3 a 6 especialidades curtas" },
+            categoria_slug: { type: "string", description: "slug da área mais próxima na lista, ou vazio" },
+          },
+          required: ["bio", "especialidades"],
+        },
+      };
   }
 }
 
@@ -96,6 +123,19 @@ Escreva a próxima mensagem do especialista.`;
       return `${d.contexto ?? "Resuma em prós e contras."}
 CONTEÚDO:
 ${d.conversa ?? d.avaliacoes ?? ""}`;
+    case "sugerir_parametros":
+      return `A equipe do YourEyes quer ajustar como a vitrine ordena os especialistas. Objetivo dito por ela: "${d.objetivo ?? ""}".
+Os sete pesos são: fit (encaixe com a obrigação legal que a empresa precisa cumprir), reputacao (avaliações e nível), saude (atendimento recente: responde rápido, não cancela), proximidade (perto da empresa ou atende remoto), exploracao (chance para quem é novo), preco (preço e promoções), destaque (destaque pago, sempre rotulado, no máximo 10).
+Pesos atuais: ${JSON.stringify(d.pesos_atuais ?? {})}. Devolva pesos inteiros que somem 100, mantendo destaque <= 10 e exploracao >= 5, e explique em linguagem simples.`;
+    case "gerar_bio":
+      return `Escreva a apresentação pública de um prestador de serviços para empresas, a partir do que ele contou:
+O QUE FAZ: ${d.o_que_faz ?? ""}
+ÁREA (se escolhida): ${d.area ?? "não informada"}
+REGISTRO PROFISSIONAL: ${d.registro ?? "não informado"}
+REGIÃO: ${[d.cidade, d.uf].filter(Boolean).join("/") || "não informada"}
+ÁREAS DISPONÍVEIS (slug = nome):
+${cats}
+Tom: direto, confiável, sem jargão. Sem telefone, e-mail ou link.`;
   }
 }
 
@@ -128,7 +168,7 @@ Deno.serve(async (req) => {
     if (!args) throw new Error("A IA não devolveu resultado estruturado");
     const resultado = JSON.parse(args);
     // Cinto de segurança: nada de contato direto em texto gerado.
-    for (const k of ["descricao", "resposta", "titulo"]) {
+    for (const k of ["descricao", "resposta", "titulo", "bio"]) {
       if (typeof resultado[k] === "string") {
         resultado[k] = resultado[k]
           .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[contato pela plataforma]")
