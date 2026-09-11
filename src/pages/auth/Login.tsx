@@ -174,7 +174,7 @@ export default function Login({ destino, variante }: { destino?: string; variant
               Cadastre sua empresa
             </Link>
           ) : (
-            <a href="/#planos" className="text-primary font-medium hover:underline">
+            <a href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/#planos`} className="text-primary font-medium hover:underline">
               Conheça os planos e contrate
             </a>
           )}

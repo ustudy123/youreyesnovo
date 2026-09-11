@@ -34,7 +34,7 @@ export interface PortalParceiroDados {
   parceiro: {
     id: string; codigo: string; nome: string; tipo_parceiro: ParceiroTipo; status: ParceiroStatus;
     cidade: string | null; uf: string | null; parceiro_desde: string; trilha: string;
-    email: string | null; telefone: string | null; pix_chave: string | null; marketplace_profissional_id: string | null;
+    email: string | null; telefone: string | null; endereco?: string | null; pix_chave: string | null; marketplace_profissional_id: string | null;
   };
   nivel: { nome: string | null; percentual: number; bonus_renovacao: number | null };
   proximo_nivel: { nome: string; mrr_minimo_cents: number; percentual: number } | null;
