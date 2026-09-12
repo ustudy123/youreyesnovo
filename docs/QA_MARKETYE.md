@@ -10,7 +10,7 @@
 | Item | Valor |
 |---|---|
 | Feature | MarketYE — marketplace de serviços (antiga "Rede de Parceiros"), MVP conexão/lead sem pagamento intra-plataforma |
-| Versão testada | `main` até o commit `3d13328` (PRs #481, #482, #483, #484, #487, #488 desta sessão; #485, #486 de outra sessão) |
+| Versão testada | `main` até o commit `abb452f` + este pacote de rotinas (PRs #481–#484, #487–#489 desta sessão; #485, #486 de outra sessão) |
 | Requisito de referência | Documento de Requisitos v2.0 (11/09/2026): RN-001..037, RF-001..030, CA-001..023 |
 | Ambiente de prova | Réplica local (997 migrations) para banco; ambiente de teste (`bmehdgthciuvdbvutsdv`, site https://ustudy123.github.io/youreyesnovo/teste/) para tela e esteira |
 | Onde os casos vivem | Super Admin → QA e Testes → **Documentação de Teste** → módulo **MarketYE**: MKY-001..015 (api, com rotina), MKY-020..022 (e2e, com Cypress) e **MKY-030..161** (este pacote: 13 famílias, documentados, sem rotina ainda) |
@@ -81,17 +81,20 @@ Casos de borda gerados pela IA que um roteiro humano tende a pular: MKY-032 (for
 
 A casa não usa pgTAP; usa rotinas `qa_caso_<x>()` que devolvem `qa_retorno`, executadas por `qa_rodar_bateria` **em transação descartada**, com `set_config('request.jwt.claims', ...)` + `SET LOCAL ROLE authenticated` para provar o lado positivo e o **negativo** do RLS. É o mesmo desenho do pgTAP, sem a extensão.
 
-**Rotinas existentes (15, todas passando):** 001 cadastro pendente e guarda; 002 perfil global cross-tenant; 003 avaliação só com transação; 004 piso × destaque; 005 célula mínima; 006 mascaramento; 007 léxico; 008 contestação; 009 exclusão LGPD; 010 ajuste de nível com aviso; 011 trilha de autonomia; 012 colunas sensíveis fechadas; 013 guarda de status/selo; 014 portal após cadastro mínimo (regressão D-01); 015 relaxamento sem erro (regressão D-02).
+**Rotinas existentes (22, todas passando):** 001 cadastro pendente e guarda; 002 perfil global cross-tenant; 003 avaliação só com transação; 004 piso × destaque; 005 célula mínima; 006 mascaramento; 007 léxico; 008 contestação; 009 exclusão LGPD; 010 ajuste de nível com aviso; 011 trilha de autonomia; 012 colunas sensíveis fechadas; 013 guarda de status/selo; 014 portal após cadastro mínimo (regressão D-01); 015 relaxamento sem erro (regressão D-02); **110–116 família de segurança** (migration 20260912030000): matriz negativa especialista × especialista (110) e empresa × empresa (111) com controles positivos, estrutura do RLS e colunas sensíveis (112), escrita silenciosa (113), superfície de EXECUTE (114), entrada hostil (115) e escrita direta nas tabelas expostas (116). Todas montam o cenário compartilhado `qa_mky_cenario_seguranca()` (dois especialistas, duas empresas, conversas, mensagens, cupom, contestação, ocorrência, destaque, documento, denúncia, contratação, demanda latente).
 
 **Erros clássicos de RLS verificados neste pacote (a escrever como rotinas):**
 
-| Erro clássico | Caso | O que prova |
-|---|---|---|
-| Política permissiva demais (`USING true`) em tabela sensível | MKY-112 | nenhuma em leads, mensagens, consentimentos, documentos |
-| `WITH CHECK` ausente | MKY-110/111/116 | INSERT com id de terceiro recusado |
-| UPDATE sem SELECT correspondente (falha silenciosa) | MKY-113 | 0 linhas e valor inalterado |
-| Tabela com RLS e zero políticas (inacessível por engano) | MKY-112 | toda tabela `marketplace_*` com RLS tem ≥ 1 política |
-| RPC com `EXECUTE` a `anon`/`authenticated` expondo capacidade sensível | MKY-114, MKY-041 | guarda interna nega; grant a revisar (D-05) |
+| Erro clássico | Caso | O que prova | Resultado |
+|---|---|---|---|
+| Política permissiva demais (`USING true`) em tabela sensível | MKY-112 | nenhuma em leads, mensagens, consentimentos, documentos | **passou** |
+| `WITH CHECK` ausente | MKY-110/111/116 | INSERT com id de terceiro recusado | **passou** |
+| UPDATE sem SELECT correspondente (falha silenciosa) | MKY-113 | negado ou 0 linhas, valor inalterado | **passou** |
+| Tabela com RLS e zero políticas (inacessível por engano) | MKY-112 | toda tabela `marketplace_*` com RLS tem ≥ 1 política | **passou** |
+| RPC com `EXECUTE` a `anon`/`authenticated` expondo capacidade sensível | MKY-114, MKY-041 | anon só na vitrine pública, vagas de demanda e consulta do próprio id; internas só service_role | **passou** (após D-05) |
+| Política com subconsulta em coluna fechada para o papel | MKY-110 | leitura direta de anúncios/pacotes/contratações e upload no Storage não podem dar "permission denied" | **passou** (após D-17) |
+
+O que a família encontrou ao ser executada pela primeira vez (12/09): D-16 (anon com SELECT de tabela inteira em avaliações) e **D-17 (13 políticas quebradas por lerem `user_id` fechado)** — as duas corrigidas na mesma migration das rotinas.
 
 Levantamento estrutural feito na réplica (12/09): 23 tabelas `marketplace_*` com RLS, todas com ≥ 1 política; 51 funções `marketye_*`, das quais 47 com EXECUTE a `anon` (herança do `PUBLIC` padrão do Postgres) e apenas 4 restritas a `service_role` (`buscar_interno`, `cadastrar_especialista_para`, `recalcular_reputacao`, `semear_ilha_teste`). As 8 funções administrativas checam `is_superadmin(auth.uid())` por dentro (conferido: moderacao_fila, contestacoes_fila, painel_liquidez, transparencia, destaque_criar, especialista_situacao, denuncia_decidir, contestacao_decidir).
 
@@ -128,7 +131,7 @@ Regra legal fixada em código encontrada: o limite anti-gaming "3 avaliações p
 |---|---|---|
 | (i) Regra cadastrada e não aplicada | As 11 chaves de `marketplace_config` são lidas por alguma função (`relevancia_pesos`, `piso_nota`, `protecao_novato`, `niveis`, `saude_recente`, `demanda_latente`, `mascaramento_contato`, `janela_avaliacao_dias`, `termos_versoes`, `localizacao`, `destaque`). `localizacao` é lida mas ainda não muda comportamento (preparação América do Sul) — aceitável, documentado. | grep nas funções (12/09) |
 | (ii) Zero/nulo que propaga em silêncio | **Encontrado e corrigido**: `especialidades` nulo derrubava o portal (D-01). Verificados sem problema: `nota_media` 0 aparece como "sem avaliações"; sem linha de reputação a saúde vira "cinza" (60) e não zero; sem `empresa_cadastro` a busca não injeta UF. | MKY-014; leitura de `marketye_buscar_interno` |
-| (iii) Vazamento entre tenants | Colunas sensíveis fechadas (passou). Perfis ativos legíveis por visitante (sem PII) por política herdada — decisão de produto (A7). Grants de EXECUTE a `anon` em funções sensíveis (D-05, guardas internas presentes). Storage: documentos privados, fotos públicas (corrigido no #486; a provar em 058). | MKY-012; `pg_policies`; `has_function_privilege` |
+| (iii) Vazamento entre tenants | Colunas sensíveis fechadas (passou). Matriz negativa especialista × especialista e empresa × empresa provada (110/111 passou). Perfis ativos legíveis por visitante (sem PII) por política herdada — decisão de produto (A7). Grants de EXECUTE a `anon` (D-05) e SELECT de anon em avaliações (D-16) corrigidos; aviso de nível fechado (D-15). Storage: documentos privados, fotos públicas; políticas reescritas (D-17). | MKY-012, 110, 111, 112, 114 |
 | (iv) Invariantes ausentes | "Encontrar especialista" não ligado aos alertas (D-07); metadados no módulo Documentos a provar. | MKY-120/122 |
 | (v) Regra fixada em código | "3 por par em 30 dias" e "mínimo 3 resultados para relaxar" (D-10). Ordem de relaxamento fixa (aceitável: é algoritmo, não regra de negócio). | `marketye_avaliar`, `marketye_buscar` |
 
@@ -140,7 +143,10 @@ Regra legal fixada em código encontrada: o limite anti-gaming "3 avaliações p
 | D-02 | Busca quebra ao relaxar filtros quando a empresa tem estado cadastrado e há < 3 resultados | vitrine filtrada por Segurança do Trabalho no teste | Crítica | Crítica | `malformed array literal: "uf"`; MKY-015; corrida #429 verde | Busca/Crítico | `text[] || 'uf'` resolvido como array literal | **Corrigido** (PR #488) |
 | D-03 | Vitrine mostrava "sem resultados" quando a RPC falhava | interceptar `marketye_buscar` com 500 | Alta | Alta | DIAG do Cypress (corrida #428) | UX/recuperação | erro do react-query não tratado | **Corrigido** (PR #487) |
 | D-04 | Semente do mobiliário de teste falhava em silêncio | migration 223000 com bloco de exceção | Média | Média | ausência de anúncio no teste | Ambiente | erro engolido em NOTICE | **Corrigido** (PRs #484/#487: função com diagnóstico) |
-| D-05 | 47 funções `marketye_*` com EXECUTE a `anon` (padrão PUBLIC), incluindo moderação, config e decisões | `has_function_privilege('anon', ...)` | Média (guarda interna nega) | Alta (defesa em profundidade; herança de risco) | levantamento §4 | Segurança/Crítico | ausência de `REVOKE ... FROM PUBLIC` | **Aberto** — sugerir migration de REVOKE, mantendo `anon` só em `vitrine_publica`, `vagas_demanda`, `cadastrar_especialista` e utilitárias puras |
+| D-05 | 47 funções `marketye_*` com EXECUTE a `anon` (padrão PUBLIC), incluindo moderação, config e decisões | `has_function_privilege('anon', ...)` | Média (guarda interna nega) | Alta (defesa em profundidade; herança de risco) | MKY-114 | Segurança/Crítico | ausência de `REVOKE ... FROM PUBLIC` | **Corrigido** (migration 20260912030000: anon só em `vitrine_publica`, `vagas_demanda` e `meu_id`; internas só `service_role`) |
+| D-15 | `marketplace_reputacao` expunha a qualquer usuário autenticado `nivel_aviso_motivo`/`nivel_aviso_em` de todos os especialistas | `column_privileges` | Baixa | Média | MKY-112 | LGPD/privacidade do prestador | política `USING true` + SELECT de tabela inteira | **Corrigido** (leitura por coluna, sem as de aviso) |
+| D-16 | Visitante anônimo com SELECT de tabela inteira em `marketplace_avaliacoes` (inclusive `tenant_id`, `avaliador_id`); a política é só para authenticated, então devolvia zero linhas, mas a concessão ficava | MKY-112 (1ª execução) | Baixa | Média | rotina 112 falhou antes da correção | Segurança | grant padrão da plataforma | **Corrigido** (REVOKE SELECT de anon) |
+| D-17 | **13 políticas** (8 em `public`, 5 em `storage.objects`) liam `marketplace_profissionais.user_id` como o próprio usuário; com a coluna fechada (MKY-012), toda leitura direta de anúncios, pacotes, contratações, comissões e documentos por usuário logado e o upload/leitura de foto e documento do especialista davam `permission denied for table marketplace_profissionais` | `SELECT count(*) FROM marketplace_servicos` como authenticated | **Crítica** | **Crítica** | rotina 110 quebrou na 2ª execução; prova empírica na réplica | Cadastro/Portal/Storage; herança de risco | subconsulta em coluna sem grant, introduzida ao fechar as colunas na fundação e repetida nas políticas de Storage do #486 | **Corrigido** (políticas reescritas com `marketye_meu_id()`; sem tocar a coluna) — regressão coberta por MKY-110 |
 | D-06 | Autocompra não bloqueada: `marketye_abrir_lead` não impede usuário abrir lead com o próprio cadastro de especialista | MKY-082 | Alta | Média | leitura da função (sem verificação de identidade dupla) | Anti-gaming/Alto | verificação não construída | **Provável, não provado** — executar MKY-082 |
 | D-07 | Alertas de compliance/psicossocial sem "Encontrar especialista" (invariante RN-015/RF-015) | abrir um alerta de NR-1 | Alta | Alta | componente existe e não é usado fora da vitrine | Integração/Alto | ligação não feita | **Aberto** (MKY-120 `aguardando_construcao`) |
 | D-08 | Esteira pula a guarda de cobertura e a semeadura da conta-robô | log da corrida: `QA_E2E_TOKEN ausente` | Média | Alta | corridas #420–#429 | Esteira | segredo não configurado no repositório | **Aberto** — configurar o segredo (ação do dono do repositório) |
@@ -161,7 +167,7 @@ Status: **passou** = rotina/spec verde na última corrida; **não provado** = do
 |---|---|---|
 | CA-001 cadastro e 1 anúncio sem contrato | 001, 030, 031, 032, 033, 036, 117 | 001 passou; demais não provado |
 | CA-002 IA gera anúncio de ≤3 campos | 050, 130, 131 | bloqueado (chave da IA) / não provado |
-| CA-003 perfil cross-tenant sem vazar | 002, 012, 068, 071, 094, 095, 110, 111 | 002/012 passou; demais não provado |
+| CA-003 perfil cross-tenant sem vazar | 002, 012, 068, 071, 094, 095, 110, 111 | 002/012/110/111 passou; demais não provado |
 | CA-004 filtros corretos; busca vazia relaxa e capta | 015, 021, 060, 063, 064, 066 | 015/021 passou; demais não provado |
 | CA-005 ordem personalizada e piso | 004, 061, 084 | 004 passou; demais não provado |
 | CA-006 proteção ao novato | 062 | não provado (ver A6) |
@@ -171,7 +177,7 @@ Status: **passou** = rotina/spec verde na última corrida; **não provado** = do
 | CA-010 destaque rotulado, não passa o piso | 004, 056 | 004 passou; 056 não provado |
 | CA-011 alerta com IA e ação | 076, 120, 121 | não provado; 120 aguardando construção (D-07) |
 | CA-012 documento no módulo Documentos | 075, 122 | não provado |
-| CA-013 ação sensível só por função | 001, 013, 116 | 001/013 passou; 116 não provado |
+| CA-013 ação sensível só por função | 001, 013, 116 | 001/013/116 passou |
 | CA-014 exclusão LGPD com retenção | 009, 091, 092 | 009 passou; 091 decisão de produto; 092 não provado |
 | CA-015 parâmetros versionados sem deploy | 100, 101, 102, 106 | não provado (D-11 a verificar) |
 | CA-016 split/escrow (Evolução) | 160 | fora |
@@ -183,7 +189,7 @@ Status: **passou** = rotina/spec verde na última corrida; **não provado** = do
 | CA-022 eventos de autonomia | 011, 057 | 011 passou; 057 não provado |
 | CA-023 pagamento só após GATE (Evolução) | 160 | fora |
 
-Cobertura por área de risco (casos documentados que já têm prova / total): Isolamento e RLS 2/13 (15%); RN-021 2/3; Busca 2/12; Devido processo 2/9; Avaliação 3/12; LGPD 2/9; Cadastro/portal 2/20; Integrações 0/7; IA 0/6; UX 1/7 (MKY-022). **Lacuna principal: a matriz negativa de RLS (MKY-110–116) ainda não tem rotina** — é o primeiro lote a automatizar.
+Cobertura por área de risco (casos documentados que já têm prova / total): Isolamento e RLS 9/13 (69%); RN-021 3/3; Busca 2/12; Devido processo 2/9; Avaliação 3/12; LGPD 2/9; Cadastro/portal 2/20; Integrações 0/7; IA 0/6; UX 1/7 (MKY-022). **Lacuna principal agora: minimização por anon (094/095) e a família de busca/reputação (lote 2).**
 
 ## 10. Recomendação
 
@@ -192,10 +198,11 @@ Cobertura por área de risco (casos documentados que já têm prova / total): Is
 **Produção: no-go por enquanto.** Bloqueadores explícitos, em ordem:
 1. Validação humana no ambiente de teste (regra da casa: só depois do "aprovado").
 2. D-13 — textos dos termos e da política de privacidade do não-usuário em versão final (jurídico); sem isso, o consentimento colhido é sobre placeholder.
-3. Executar as rotinas da família de segurança (MKY-110–116) e da minimização (094, 095) antes de expor qualquer perfil real: é a herança de risco citada no requisito (25).
-4. D-05 — REVOKE de `anon` nas funções sensíveis (migration pequena, sem impacto de tela).
+3. ~~Executar as rotinas da família de segurança (MKY-110–116)~~ **feito (7/7 passou, com D-16 e D-17 corrigidos)**; falta a minimização por anon (094, 095) antes de expor qualquer perfil real.
+4. ~~D-05 — REVOKE de `anon`~~ **feito**.
 5. D-06 — provar (MKY-082) e, se confirmado, bloquear autocompra em `marketye_abrir_lead`.
 6. D-07 — ligar "Encontrar especialista" aos alertas (invariante global) ou registrar como onda seguinte com aceite do dono do produto.
+7. Novo: o ambiente de teste precisa de uma passada manual em upload de foto/documento do especialista e leitura direta de anúncios depois de D-17 (o defeito estava em produção de teste desde a fundação).
 
 Reverificar após correções: bateria completa (`qa_rodar_bateria('manual','rede-parceiros')`), Cypress e a conferência do script de entrega.
 
@@ -205,7 +212,7 @@ Reverificar após correções: bateria completa (`qa_rodar_bateria('manual','red
 
 | Lote | Casos | Forma | Esforço manual que elimina por ciclo |
 |---|---|---|---|
-| 1 — Segurança/RLS | 110, 111, 112, 113, 114, 116 | rotina SQL única com matriz tabela × operação × papel (gerada por predicado reverso: dados que satisfazem e que violam cada política) | ~3 h de checagem manual impossível de fazer bem à mão |
+| 1 — Segurança/RLS | 110, 111, 112, 113, 114, 115, 116 | **feito**: sete rotinas sobre um cenário compartilhado, na bateria do staging | ~3 h de checagem manual impossível de fazer bem à mão |
 | 2 — Busca e reputação | 060, 061, 062, 063, 064, 065, 068, 080, 081, 082, 083, 084, 085 | rotinas `qa_caso_mky_*` | ~4 h |
 | 3 — LGPD e governança | 090, 092, 093, 094, 095, 096, 100, 101, 102, 103, 106 | rotinas | ~2 h |
 | 4 — Estruturais auto-regeneráveis | 044, 046, 112, 114, 145 | SQL sobre catálogos + varredura de texto (não dependem de layout) | ~1 h |
@@ -218,9 +225,9 @@ Estimativa: os 96 casos, a ~12 min cada em execução manual, custam ~19 h por c
 
 ## Avaliação crítica do agente
 
-1. **Qual área crítica ficou subtestada?** Isolamento entre tenants: só 2 dos 13 casos têm rotina. A matriz negativa ainda é promessa.
+1. **Qual área crítica ficou subtestada?** Isolamento entre tenants foi de 2 para 9 casos com rotina; falta a minimização por visitante (094/095). E a primeira execução da família achou um defeito crítico (D-17) que estava no ambiente de teste desde a fundação: a matriz negativa paga o próprio custo.
 2. **Onde estou assumindo que "a tela funciona" logo "o cálculo está certo"?** Em relevância (pesos) e em níveis: provei que os parâmetros são lidos, não que a ordem resultante é a que o produto quer. A1 pede validação humana dos números.
-3. **Testei o lado negativo do RLS?** Só colunas (MKY-012) e o cercado. Linhas por tenant e por especialista (110/111) estão documentadas, não provadas.
+3. **Testei o lado negativo do RLS?** Sim: linhas por tenant e por especialista (110/111), escrita silenciosa (113) e escrita direta (116), com controles positivos para a rotina não passar à toa.
 4. **O oráculo do meu teste é a norma ou só o spec?** Nos casos de LGPD, CDC e CLT citei artigos; mas a lista de categorias reguladas e os prazos de retenção vêm do jurídico, e sem eles o oráculo é incompleto (A2, A3).
 5. **Que borda a IA gerou que eu teria ignorado?** Autocompra por identidade dupla (MKY-082): o requisito prevê, o build não bloqueia, ninguém tinha olhado.
 6. **Onde emiti "passou" sem prova suficiente?** Em nenhum caso novo. Os 18 "passou" têm rotina ou spec verde na corrida #429. Mas o "passou" de MKY-021 depende do mobiliário do ambiente de teste, que já falhou em silêncio antes.
