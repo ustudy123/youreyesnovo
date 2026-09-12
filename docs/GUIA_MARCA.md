@@ -82,3 +82,22 @@ Sem exagero. **Nunca prometer conformidade ou resultado automático.**
 2. **Este guia** = o resto (nome, tom, público, pilares, do/don't). Injetado
    automaticamente pela Central de Comando GTM (constante `BRAND_PROMPT`) e pelos
    subagentes em `.claude/agents/`.
+
+## Templates de post (método confiável de arte)
+A arte no padrão do feed NÃO vem do gerador de IA "do zero" — vem de **preencher
+um layout desenhado por vocês**. Método validado (09/2026):
+
+1. **Molde** = um post real da YourEyes no Canva (ex.: design `DAHVA4RxENo`,
+   página 1 — "APAREÇA pra quem está PROCURANDO", com Íris + mockup + navy).
+2. Para gerar uma peça: **copiar** o molde (`copy-design`, só a página do post) →
+   **trocar os textos** (`edit-design` `replace_text`) → **exportar** (`export-design` PNG).
+   O layout, a Íris, o mockup e as cores ficam intactos; só o texto muda.
+3. **Campos do molde "manchete"** (ids de elemento estáveis entre cópias):
+   - `LBgRTN2nQDQH9CvX` — gancho (linha branca de cima; ex.: "Decisões no escuro?")
+   - `LB63FGmKFsrypyf2` — destaque 1 (palavra grande azul; ex.: "ENXERGUE")
+   - `LBRYlX7cfhbyKlwY` — linha 2 (branca; ex.: "o que sua gestão")
+   - `LBhbnGL1GGXXWFlQ` — destaque 2 (grande azul; ex.: "ainda não vê")
+   (o `locator_id` real é `<page_id>-<esses ids>`; leia a cópia com `read-design`
+   para obter o `page_id` antes do `replace_text`.)
+4. Conforme forem surgindo mais posts-modelo (carrossel narrativo, etc.), registrar
+   cada molde aqui com seu id e seus campos.
