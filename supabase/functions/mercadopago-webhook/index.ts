@@ -1,7 +1,10 @@
 // Webhook do Mercado Pago — recebe notificações de pagamento, atualiza assinaturas
 // e, quando aprovado, provisiona tenant + cliente e envia e-mail de ativação.
 // Público (verify_jwt=false). MP não envia JWT; validação por consulta autenticada à API do MP.
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const STATUS_MAP: Record<string, string> = {
