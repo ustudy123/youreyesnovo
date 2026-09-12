@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { Loader2, Sparkles, Star, MessageSquare, FileText, Activity, ShieldCheck, Gavel, Ticket, Download, Trash2, Send, Eye, PauseCircle, PlayCircle, Pencil, CheckCircle2, AlertTriangle, Clock, Phone, Mail, Building2, Circle, ArrowRight, Wand2 } from "lucide-react";
+import { Loader2, Sparkles, Star, MessageSquare, FileText, Activity, ShieldCheck, Gavel, Ticket, Download, Trash2, Send, Eye, PauseCircle, PlayCircle, Pencil, CheckCircle2, AlertTriangle, Clock, Phone, Mail, Building2, Circle, ArrowRight, Wand2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -104,7 +104,7 @@ export default function PortalEspecialista() {
           </TabsList>
           <TabsContent value="caminho" className="mt-4"><CaminhoTab d={d} irPara={setAba} novoServico={() => { setAba("servicos"); setNovoServico(true); }} /></TabsContent>
           <TabsContent value="servicos" className="mt-4"><ServicosTab anuncios={d.anuncios} perfilAtivo={d.perfil.status === "ativo"} abrirNovo={novoServico} onNovoAberto={() => setNovoServico(false)} /></TabsContent>
-          <TabsContent value="conversas" className="mt-4"><ConversasTab leads={d.leads} /></TabsContent>
+          <TabsContent value="conversas" className="mt-4"><ConversasTab leads={d.leads} onAtualizar={() => void portal.refetch()} atualizando={portal.isFetching} /></TabsContent>
           <TabsContent value="reputacao" className="mt-4"><ReputacaoTab d={d} /></TabsContent>
           <TabsContent value="perfil" className="mt-4"><PerfilTab d={d} /></TabsContent>
           <TabsContent value="cupons" className="mt-4"><CuponsTab cupons={d.cupons} /></TabsContent>
@@ -331,13 +331,28 @@ function AnuncioEditor({ anuncio, onClose }: { anuncio: PortalAnuncio | null; on
 // ---------------------------------------------------------------------
 // Conversas com empresas
 // ---------------------------------------------------------------------
-function ConversasTab({ leads }: { leads: PortalLead[] }) {
+// A lista se atualiza sozinha (a cada 30 s e ao voltar à aba); o botão é para
+// quem não quer esperar.
+function ConversasTab({ leads, onAtualizar, atualizando }: { leads: PortalLead[]; onAtualizar: () => void; atualizando: boolean }) {
   const [sel, setSel] = useState<PortalLead | null>(null);
   useEffect(() => { if (sel) { const a = leads.find((l) => l.id === sel.id); if (a && a !== sel) setSel(a); } }, [leads, sel]);
-  if (leads.length === 0) return <p className="text-sm text-slate-400 py-8 text-center">Nenhuma empresa entrou em contato ainda. Publique seus serviços e complete o perfil: é assim que as empresas encontram você.</p>;
+  const botaoAtualizar = (
+    <Button size="sm" variant="ghost" className="text-slate-300 hover:text-white hover:bg-white/10" onClick={onAtualizar} disabled={atualizando} data-testid="portal-conversas-atualizar">
+      <RefreshCw className={`w-3.5 h-3.5 mr-1 ${atualizando ? "animate-spin" : ""}`} />Atualizar
+    </Button>
+  );
+  if (leads.length === 0) {
+    return (
+      <div className="py-8 text-center space-y-2">
+        <p className="text-sm text-slate-400">Nenhuma empresa entrou em contato ainda. Publique seus serviços e complete o perfil: é assim que as empresas encontram você.</p>
+        {botaoAtualizar}
+      </div>
+    );
+  }
   return (
     <div className="grid md:grid-cols-[320px_1fr] gap-4">
       <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
+        <div className="flex justify-end">{botaoAtualizar}</div>
         {leads.map((l) => (
           <button key={l.id} onClick={() => setSel(l)} className={`w-full text-left rounded-xl border p-3 transition ${sel?.id === l.id ? "border-[#60ABEF] bg-white/10" : "border-white/10 hover:bg-white/5"}`}>
             <div className="flex items-center justify-between gap-2"><span className="font-medium text-sm text-white truncate">{l.empresa_nome ?? "Empresa"}</span><Badge className="bg-white/10 text-slate-200 text-[10px]">{LEAD_STATUS_LABEL[l.status] ?? l.status}</Badge></div>

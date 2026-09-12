@@ -202,6 +202,10 @@ export function useMarketYELeads() {
       return (data ?? []) as MarketYELead[];
     },
     enabled: !!tenantId && !!user,
+    // Resposta do especialista muda a lista (situação, última mensagem):
+    // reconsulta por tempo e ao voltar à aba, como no portal do especialista.
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
   });
 }
 

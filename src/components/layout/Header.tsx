@@ -100,14 +100,15 @@ export const Header = ({ onMenuToggle, isMobile, isSidebarCollapsed, onSidebarTo
           </Button>
         )}
 
-        {/* MarketYE (marketplace de serviços) - acesso global; antigo "Rede de Parceiros" */}
+        {/* MarketYE (marketplace de serviços) - acesso global; antigo "Rede de Parceiros".
+            Laranja da paleta (--brand-orange), para se destacar do azul do cabeçalho. */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => window.open(`${import.meta.env.BASE_URL.replace(/\/$/, "")}/marketplace`, "_blank", "noopener,noreferrer")}
-              className="flex items-center gap-2 text-white/90 hover:text-white hover:bg-white/15"
+              className="flex items-center gap-2 bg-[hsl(var(--brand-orange))] text-white hover:bg-[hsl(var(--brand-orange)/0.85)] hover:text-white font-semibold shadow-sm"
             >
               <Store className="w-5 h-5" />
               <span className="hidden lg:inline text-sm font-medium" data-testid="header-marketye">MarketYE</span>
