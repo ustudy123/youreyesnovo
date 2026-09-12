@@ -448,6 +448,35 @@ export type Database = {
           },
         ]
       }
+      addon_prices: {
+        Row: {
+          feature_key: string
+          is_active: boolean
+          unit_price_cents: number
+          updated_at: string
+        }
+        Insert: {
+          feature_key: string
+          is_active?: boolean
+          unit_price_cents?: number
+          updated_at?: string
+        }
+        Update: {
+          feature_key?: string
+          is_active?: boolean
+          unit_price_cents?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "addon_prices_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: true
+            referencedRelation: "features"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
       admissao_desligamento_historico: {
         Row: {
           admissao_id: string
@@ -1813,6 +1842,7 @@ export type Database = {
           preco_mensal: number
           preference_id: string | null
           raw_payload: Json | null
+          ref_codigo: string | null
           status: string
           tenant_id: string | null
           updated_at: string
@@ -1835,6 +1865,7 @@ export type Database = {
           preco_mensal: number
           preference_id?: string | null
           raw_payload?: Json | null
+          ref_codigo?: string | null
           status?: string
           tenant_id?: string | null
           updated_at?: string
@@ -1857,6 +1888,7 @@ export type Database = {
           preco_mensal?: number
           preference_id?: string | null
           raw_payload?: Json | null
+          ref_codigo?: string | null
           status?: string
           tenant_id?: string | null
           updated_at?: string
@@ -2453,6 +2485,54 @@ export type Database = {
           },
         ]
       }
+      backup_decimo_terceiro_config_20260904: {
+        Row: {
+          adiantamento_base: string | null
+          afastamento_dias_empregador: number | null
+          afastamento_regra: string | null
+          created_at: string | null
+          divisor_horas_mes: number | null
+          empresa_id: string | null
+          id: string | null
+          media_divisor: string | null
+          media_horas_extras: string | null
+          media_inclui_protegidas: boolean | null
+          parametros_vigencia_inicio: string | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          adiantamento_base?: string | null
+          afastamento_dias_empregador?: number | null
+          afastamento_regra?: string | null
+          created_at?: string | null
+          divisor_horas_mes?: number | null
+          empresa_id?: string | null
+          id?: string | null
+          media_divisor?: string | null
+          media_horas_extras?: string | null
+          media_inclui_protegidas?: boolean | null
+          parametros_vigencia_inicio?: string | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          adiantamento_base?: string | null
+          afastamento_dias_empregador?: number | null
+          afastamento_regra?: string | null
+          created_at?: string | null
+          divisor_horas_mes?: number | null
+          empresa_id?: string | null
+          id?: string | null
+          media_divisor?: string | null
+          media_horas_extras?: string | null
+          media_inclui_protegidas?: boolean | null
+          parametros_vigencia_inicio?: string | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       backup_dossies_duplicados_20260901: {
         Row: {
           competencia: string | null
@@ -2644,6 +2724,180 @@ export type Database = {
           tentativas_frustradas?: number | null
           tipo?: string | null
           token?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      backup_parceiro_eventos_20260904: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          evento: string | null
+          id: string | null
+          percentual_primeira_mensalidade: number | null
+          tipo_parceiro: string | null
+          trilha: string | null
+          valor_fixo_cents: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          created_at?: string | null
+          evento?: string | null
+          id?: string | null
+          percentual_primeira_mensalidade?: number | null
+          tipo_parceiro?: string | null
+          trilha?: string | null
+          valor_fixo_cents?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          created_at?: string | null
+          evento?: string | null
+          id?: string | null
+          percentual_primeira_mensalidade?: number | null
+          tipo_parceiro?: string | null
+          trilha?: string | null
+          valor_fixo_cents?: number | null
+        }
+        Relationships: []
+      }
+      backup_parceiro_niveis_20260904: {
+        Row: {
+          ativo: boolean | null
+          bonus_renovacao_multiplicador: number | null
+          created_at: string | null
+          id: string | null
+          mrr_minimo_cents: number | null
+          nome: string | null
+          ordem: number | null
+          percentual_casa: number | null
+          percentual_link: number | null
+          trilha: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          bonus_renovacao_multiplicador?: number | null
+          created_at?: string | null
+          id?: string | null
+          mrr_minimo_cents?: number | null
+          nome?: string | null
+          ordem?: number | null
+          percentual_casa?: number | null
+          percentual_link?: number | null
+          trilha?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          bonus_renovacao_multiplicador?: number | null
+          created_at?: string | null
+          id?: string | null
+          mrr_minimo_cents?: number | null
+          nome?: string | null
+          ordem?: number | null
+          percentual_casa?: number | null
+          percentual_link?: number | null
+          trilha?: string | null
+        }
+        Relationships: []
+      }
+      backup_ponto_diario_preassin_20260909: {
+        Row: {
+          adicional_noturno_minutos: number | null
+          atraso_minutos: number | null
+          colaborador_cpf: string | null
+          colaborador_id: string | null
+          colaborador_nome: string | null
+          created_at: string | null
+          data: string | null
+          empresa_id: string | null
+          entrada: string | null
+          escala_id: string | null
+          feriado_nome: string | null
+          feriado_trabalhado: boolean | null
+          he_intervalo_suprimido_minutos: number | null
+          horas_extras: string | null
+          horas_extras_100_minutos: number | null
+          horas_extras_50_minutos: number | null
+          horas_faltantes: string | null
+          horas_trabalhadas: string | null
+          id: string | null
+          intervalo_intrajornada_minutos: number | null
+          intervalo_origem: string | null
+          intervalo_pre_assinalado_minutos: number | null
+          observacao: string | null
+          retorno_almoco: string | null
+          saida: string | null
+          saida_almoco: string | null
+          status: string | null
+          tenant_id: string | null
+          tipo_dia: string | null
+          tolerancia_aplicada: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          adicional_noturno_minutos?: number | null
+          atraso_minutos?: number | null
+          colaborador_cpf?: string | null
+          colaborador_id?: string | null
+          colaborador_nome?: string | null
+          created_at?: string | null
+          data?: string | null
+          empresa_id?: string | null
+          entrada?: string | null
+          escala_id?: string | null
+          feriado_nome?: string | null
+          feriado_trabalhado?: boolean | null
+          he_intervalo_suprimido_minutos?: number | null
+          horas_extras?: string | null
+          horas_extras_100_minutos?: number | null
+          horas_extras_50_minutos?: number | null
+          horas_faltantes?: string | null
+          horas_trabalhadas?: string | null
+          id?: string | null
+          intervalo_intrajornada_minutos?: number | null
+          intervalo_origem?: string | null
+          intervalo_pre_assinalado_minutos?: number | null
+          observacao?: string | null
+          retorno_almoco?: string | null
+          saida?: string | null
+          saida_almoco?: string | null
+          status?: string | null
+          tenant_id?: string | null
+          tipo_dia?: string | null
+          tolerancia_aplicada?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          adicional_noturno_minutos?: number | null
+          atraso_minutos?: number | null
+          colaborador_cpf?: string | null
+          colaborador_id?: string | null
+          colaborador_nome?: string | null
+          created_at?: string | null
+          data?: string | null
+          empresa_id?: string | null
+          entrada?: string | null
+          escala_id?: string | null
+          feriado_nome?: string | null
+          feriado_trabalhado?: boolean | null
+          he_intervalo_suprimido_minutos?: number | null
+          horas_extras?: string | null
+          horas_extras_100_minutos?: number | null
+          horas_extras_50_minutos?: number | null
+          horas_faltantes?: string | null
+          horas_trabalhadas?: string | null
+          id?: string | null
+          intervalo_intrajornada_minutos?: number | null
+          intervalo_origem?: string | null
+          intervalo_pre_assinalado_minutos?: number | null
+          observacao?: string | null
+          retorno_almoco?: string | null
+          saida?: string | null
+          saida_almoco?: string | null
+          status?: string | null
+          tenant_id?: string | null
+          tipo_dia?: string | null
+          tolerancia_aplicada?: boolean | null
           updated_at?: string | null
         }
         Relationships: []
@@ -3725,11 +3979,13 @@ export type Database = {
           geo_lat: number | null
           geo_lng: number | null
           hash_documento: string | null
+          html_assinado: string | null
           id: string
           ip_address: string | null
           link_enviado_em: string | null
           link_enviado_para: string | null
           observacoes: string | null
+          parceiro_id: string | null
           selfie_imagem: string | null
           signatario_cnpj: string | null
           signatario_cpf: string | null
@@ -3754,11 +4010,13 @@ export type Database = {
           geo_lat?: number | null
           geo_lng?: number | null
           hash_documento?: string | null
+          html_assinado?: string | null
           id?: string
           ip_address?: string | null
           link_enviado_em?: string | null
           link_enviado_para?: string | null
           observacoes?: string | null
+          parceiro_id?: string | null
           selfie_imagem?: string | null
           signatario_cnpj?: string | null
           signatario_cpf?: string | null
@@ -3783,11 +4041,13 @@ export type Database = {
           geo_lat?: number | null
           geo_lng?: number | null
           hash_documento?: string | null
+          html_assinado?: string | null
           id?: string
           ip_address?: string | null
           link_enviado_em?: string | null
           link_enviado_para?: string | null
           observacoes?: string | null
+          parceiro_id?: string | null
           selfie_imagem?: string | null
           signatario_cnpj?: string | null
           signatario_cpf?: string | null
@@ -3809,6 +4069,13 @@ export type Database = {
             columns: ["contrato_id"]
             isOneToOne: false
             referencedRelation: "contratos_aceite"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_assinaturas_parceiro_id_fkey"
+            columns: ["parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
             referencedColumns: ["id"]
           },
         ]
@@ -4398,6 +4665,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      decimo_terceiro_config: {
+        Row: {
+          adiantamento_base: string
+          afastamento_dias_empregador: number
+          afastamento_regra: string
+          created_at: string
+          divisor_horas_mes: number
+          empresa_id: string | null
+          id: string
+          media_divisor: string
+          media_horas_extras: string
+          media_inclui_protegidas: boolean
+          parametros_vigencia_inicio: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          adiantamento_base?: string
+          afastamento_dias_empregador?: number
+          afastamento_regra?: string
+          created_at?: string
+          divisor_horas_mes?: number
+          empresa_id?: string | null
+          id?: string
+          media_divisor?: string
+          media_horas_extras?: string
+          media_inclui_protegidas?: boolean
+          parametros_vigencia_inicio?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          adiantamento_base?: string
+          afastamento_dias_empregador?: number
+          afastamento_regra?: string
+          created_at?: string
+          divisor_horas_mes?: number
+          empresa_id?: string | null
+          id?: string
+          media_divisor?: string
+          media_horas_extras?: string
+          media_inclui_protegidas?: boolean
+          parametros_vigencia_inicio?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       departamentos: {
         Row: {
@@ -5435,6 +5750,95 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tenants"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      entitlement_audit_log: {
+        Row: {
+          action: string
+          actor: string | null
+          after: Json | null
+          before: Json | null
+          created_at: string
+          entity: string | null
+          entity_id: string | null
+          id: string
+          tenant_id: string | null
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          tenant_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          tenant_id?: string | null
+        }
+        Relationships: []
+      }
+      entitlement_denials_log: {
+        Row: {
+          context: string | null
+          created_at: string
+          feature_key: string
+          id: string
+          reason: string | null
+          tenant_id: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          feature_key: string
+          id?: string
+          reason?: string | null
+          tenant_id: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          feature_key?: string
+          id?: string
+          reason?: string | null
+          tenant_id?: string
+        }
+        Relationships: []
+      }
+      entitlement_gated_tables: {
+        Row: {
+          feature_key: string
+          mode: string
+          table_name: string
+        }
+        Insert: {
+          feature_key: string
+          mode?: string
+          table_name: string
+        }
+        Update: {
+          feature_key?: string
+          mode?: string
+          table_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entitlement_gated_tables_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["key"]
           },
         ]
       }
@@ -6754,16 +7158,27 @@ export type Database = {
       }
       esocial_transmissoes: {
         Row: {
+          ano: number | null
           certificado_id: string | null
           codigo_retorno: string | null
+          colaborador_cpf: string | null
+          competencia: string | null
           created_at: string
           criado_por: string | null
           criado_por_nome: string | null
           empresa_id: string | null
           evento_sst_id: string | null
+          ferias_calculo_id: string | null
           id: string
+          ind_apuracao: number | null
+          leiaute_versao: string | null
           mensagem_retorno: string | null
+          motivo_afastamento: string | null
           numero_recibo: string | null
+          origem_id: string | null
+          origem_modulo: string | null
+          parcela: number | null
+          periodo_apuracao: string | null
           protocolo: string | null
           status: string
           tenant_id: string
@@ -6775,16 +7190,27 @@ export type Database = {
           xml_retorno: string | null
         }
         Insert: {
+          ano?: number | null
           certificado_id?: string | null
           codigo_retorno?: string | null
+          colaborador_cpf?: string | null
+          competencia?: string | null
           created_at?: string
           criado_por?: string | null
           criado_por_nome?: string | null
           empresa_id?: string | null
           evento_sst_id?: string | null
+          ferias_calculo_id?: string | null
           id?: string
+          ind_apuracao?: number | null
+          leiaute_versao?: string | null
           mensagem_retorno?: string | null
+          motivo_afastamento?: string | null
           numero_recibo?: string | null
+          origem_id?: string | null
+          origem_modulo?: string | null
+          parcela?: number | null
+          periodo_apuracao?: string | null
           protocolo?: string | null
           status?: string
           tenant_id: string
@@ -6796,16 +7222,27 @@ export type Database = {
           xml_retorno?: string | null
         }
         Update: {
+          ano?: number | null
           certificado_id?: string | null
           codigo_retorno?: string | null
+          colaborador_cpf?: string | null
+          competencia?: string | null
           created_at?: string
           criado_por?: string | null
           criado_por_nome?: string | null
           empresa_id?: string | null
           evento_sst_id?: string | null
+          ferias_calculo_id?: string | null
           id?: string
+          ind_apuracao?: number | null
+          leiaute_versao?: string | null
           mensagem_retorno?: string | null
+          motivo_afastamento?: string | null
           numero_recibo?: string | null
+          origem_id?: string | null
+          origem_modulo?: string | null
+          parcela?: number | null
+          periodo_apuracao?: string | null
           protocolo?: string | null
           status?: string
           tenant_id?: string
@@ -7711,6 +8148,42 @@ export type Database = {
           },
         ]
       }
+      features: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          key: string
+          kind: string
+          name: string
+          unit: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          key: string
+          kind: string
+          name: string
+          unit?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          key?: string
+          kind?: string
+          name?: string
+          unit?: string | null
+        }
+        Relationships: []
+      }
       feed_comentarios: {
         Row: {
           autor_avatar: string | null
@@ -8197,6 +8670,78 @@ export type Database = {
           },
         ]
       }
+      ferias_alertas: {
+        Row: {
+          aquisitivo_fim: string | null
+          colaborador_cpf: string | null
+          colaborador_id: string | null
+          colaborador_nome: string | null
+          concessivo_fim: string | null
+          created_at: string
+          custo_estimado: number | null
+          descricao: string | null
+          dias_para_vencer: number | null
+          empresa_id: string | null
+          faixa: string
+          id: string
+          periodo_id: string | null
+          plano_acao_id: string | null
+          resolvido: boolean
+          resolvido_em: string | null
+          severidade: string
+          tenant_id: string
+          tipo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          aquisitivo_fim?: string | null
+          colaborador_cpf?: string | null
+          colaborador_id?: string | null
+          colaborador_nome?: string | null
+          concessivo_fim?: string | null
+          created_at?: string
+          custo_estimado?: number | null
+          descricao?: string | null
+          dias_para_vencer?: number | null
+          empresa_id?: string | null
+          faixa: string
+          id?: string
+          periodo_id?: string | null
+          plano_acao_id?: string | null
+          resolvido?: boolean
+          resolvido_em?: string | null
+          severidade?: string
+          tenant_id: string
+          tipo: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          aquisitivo_fim?: string | null
+          colaborador_cpf?: string | null
+          colaborador_id?: string | null
+          colaborador_nome?: string | null
+          concessivo_fim?: string | null
+          created_at?: string
+          custo_estimado?: number | null
+          descricao?: string | null
+          dias_para_vencer?: number | null
+          empresa_id?: string | null
+          faixa?: string
+          id?: string
+          periodo_id?: string | null
+          plano_acao_id?: string | null
+          resolvido?: boolean
+          resolvido_em?: string | null
+          severidade?: string
+          tenant_id?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ferias_assinatura_links: {
         Row: {
           abono_pecuniario: boolean | null
@@ -8289,6 +8834,101 @@ export type Database = {
           },
         ]
       }
+      ferias_coletivas: {
+        Row: {
+          ano: number
+          created_at: string
+          criado_por: string | null
+          departamento: string
+          empresa_id: string | null
+          estado: string
+          id: string
+          observacao: string | null
+          p1_fim: string
+          p1_inicio: string
+          p2_fim: string | null
+          p2_inicio: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          ano: number
+          created_at?: string
+          criado_por?: string | null
+          departamento: string
+          empresa_id?: string | null
+          estado?: string
+          id?: string
+          observacao?: string | null
+          p1_fim: string
+          p1_inicio: string
+          p2_fim?: string | null
+          p2_inicio?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          ano?: number
+          created_at?: string
+          criado_por?: string | null
+          departamento?: string
+          empresa_id?: string | null
+          estado?: string
+          id?: string
+          observacao?: string | null
+          p1_fim?: string
+          p1_inicio?: string
+          p2_fim?: string | null
+          p2_inicio?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ferias_coletivas_comunicados: {
+        Row: {
+          coletiva_id: string
+          created_at: string
+          destino: string
+          documento_id: string | null
+          id: string
+          prazo_limite: string
+          protocolado_em: string | null
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          coletiva_id: string
+          created_at?: string
+          destino: string
+          documento_id?: string | null
+          id?: string
+          prazo_limite: string
+          protocolado_em?: string | null
+          status?: string
+          tenant_id: string
+        }
+        Update: {
+          coletiva_id?: string
+          created_at?: string
+          destino?: string
+          documento_id?: string | null
+          id?: string
+          prazo_limite?: string
+          protocolado_em?: string | null
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferias_coletivas_comunicados_coletiva_id_fkey"
+            columns: ["coletiva_id"]
+            isOneToOne: false
+            referencedRelation: "ferias_coletivas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ferias_config: {
         Row: {
           created_at: string
@@ -8298,6 +8938,9 @@ export type Database = {
           encargo_rat_fap: number
           encargo_terceiros: number
           id: string
+          media_base: string
+          media_divisor: string
+          media_vigencia_inicio: string
           metodo_calculo: string
           simples_dispensa_patronal: boolean
           tenant_id: string
@@ -8311,6 +8954,9 @@ export type Database = {
           encargo_rat_fap?: number
           encargo_terceiros?: number
           id?: string
+          media_base?: string
+          media_divisor?: string
+          media_vigencia_inicio?: string
           metodo_calculo?: string
           simples_dispensa_patronal?: boolean
           tenant_id: string
@@ -8324,6 +8970,9 @@ export type Database = {
           encargo_rat_fap?: number
           encargo_terceiros?: number
           id?: string
+          media_base?: string
+          media_divisor?: string
+          media_vigencia_inicio?: string
           metodo_calculo?: string
           simples_dispensa_patronal?: boolean
           tenant_id?: string
@@ -8565,6 +9214,9 @@ export type Database = {
           aprovado_por_nome: string | null
           assinatura_link_id: string | null
           assinatura_status: string | null
+          aviso_ciencia_em: string | null
+          aviso_ciencia_origem: string | null
+          aviso_ciencia_por: string | null
           aviso_gerado: boolean | null
           cargo: string | null
           checkin_retorno_enviado: boolean | null
@@ -8610,6 +9262,9 @@ export type Database = {
           aprovado_por_nome?: string | null
           assinatura_link_id?: string | null
           assinatura_status?: string | null
+          aviso_ciencia_em?: string | null
+          aviso_ciencia_origem?: string | null
+          aviso_ciencia_por?: string | null
           aviso_gerado?: boolean | null
           cargo?: string | null
           checkin_retorno_enviado?: boolean | null
@@ -8655,6 +9310,9 @@ export type Database = {
           aprovado_por_nome?: string | null
           assinatura_link_id?: string | null
           assinatura_status?: string | null
+          aviso_ciencia_em?: string | null
+          aviso_ciencia_origem?: string | null
+          aviso_ciencia_por?: string | null
           aviso_gerado?: boolean | null
           cargo?: string | null
           checkin_retorno_enviado?: boolean | null
@@ -8843,19 +9501,35 @@ export type Database = {
       }
       folha_13_calculo: {
         Row: {
+          admissao_id: string | null
           ano: number
+          aprovado_em: string | null
+          aprovado_por: string | null
+          aprovado_por_nome: string | null
+          avos_origem: string
           base_fgts: number | null
           base_inss: number | null
           base_irrf: number | null
           colaborador_cpf: string | null
           colaborador_id: string
           colaborador_nome: string
+          competencia: string | null
           created_at: string
+          data_pagamento: string | null
+          data_prevista: string | null
+          empresa_id: string | null
           id: string
+          lote_id: string | null
+          media_origem: string
           media_variaveis: number | null
           memoria_calculo: Json | null
           meses_trabalhados: number
+          observacao: string | null
+          pago_em: string | null
+          pago_por: string | null
           parcela: number
+          reaberto_de: string | null
+          reabertura_motivo: string | null
           remuneracao_base: number
           status: string
           tenant_id: string
@@ -8870,19 +9544,35 @@ export type Database = {
           valor_primeira_parcela: number | null
         }
         Insert: {
+          admissao_id?: string | null
           ano: number
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          aprovado_por_nome?: string | null
+          avos_origem?: string
           base_fgts?: number | null
           base_inss?: number | null
           base_irrf?: number | null
           colaborador_cpf?: string | null
           colaborador_id: string
           colaborador_nome: string
+          competencia?: string | null
           created_at?: string
+          data_pagamento?: string | null
+          data_prevista?: string | null
+          empresa_id?: string | null
           id?: string
+          lote_id?: string | null
+          media_origem?: string
           media_variaveis?: number | null
           memoria_calculo?: Json | null
           meses_trabalhados?: number
+          observacao?: string | null
+          pago_em?: string | null
+          pago_por?: string | null
           parcela?: number
+          reaberto_de?: string | null
+          reabertura_motivo?: string | null
           remuneracao_base?: number
           status?: string
           tenant_id: string
@@ -8897,19 +9587,35 @@ export type Database = {
           valor_primeira_parcela?: number | null
         }
         Update: {
+          admissao_id?: string | null
           ano?: number
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          aprovado_por_nome?: string | null
+          avos_origem?: string
           base_fgts?: number | null
           base_inss?: number | null
           base_irrf?: number | null
           colaborador_cpf?: string | null
           colaborador_id?: string
           colaborador_nome?: string
+          competencia?: string | null
           created_at?: string
+          data_pagamento?: string | null
+          data_prevista?: string | null
+          empresa_id?: string | null
           id?: string
+          lote_id?: string | null
+          media_origem?: string
           media_variaveis?: number | null
           memoria_calculo?: Json | null
           meses_trabalhados?: number
+          observacao?: string | null
+          pago_em?: string | null
+          pago_por?: string | null
           parcela?: number
+          reaberto_de?: string | null
+          reabertura_motivo?: string | null
           remuneracao_base?: number
           status?: string
           tenant_id?: string
@@ -8925,6 +9631,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "folha_13_calculo_admissao_id_fkey"
+            columns: ["admissao_id"]
+            isOneToOne: false
+            referencedRelation: "admissoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folha_13_calculo_reaberto_de_fkey"
+            columns: ["reaberto_de"]
+            isOneToOne: false
+            referencedRelation: "folha_13_calculo"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "folha_13_calculo_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -8935,6 +9655,7 @@ export type Database = {
       }
       folha_alertas_prazo: {
         Row: {
+          ano: number | null
           colaborador_id: string | null
           colaborador_nome: string | null
           competencia: string
@@ -8943,13 +9664,19 @@ export type Database = {
           created_at: string
           data_limite: string
           descricao: string
+          empresa_id: string | null
+          faixa: string | null
           id: string
+          plano_acao_id: string | null
+          severidade: string
           status: string
           tenant_id: string
           tipo: string
+          updated_at: string
           valor_referencia: number | null
         }
         Insert: {
+          ano?: number | null
           colaborador_id?: string | null
           colaborador_nome?: string | null
           competencia: string
@@ -8958,13 +9685,19 @@ export type Database = {
           created_at?: string
           data_limite: string
           descricao: string
+          empresa_id?: string | null
+          faixa?: string | null
           id?: string
+          plano_acao_id?: string | null
+          severidade?: string
           status?: string
           tenant_id: string
           tipo: string
+          updated_at?: string
           valor_referencia?: number | null
         }
         Update: {
+          ano?: number | null
           colaborador_id?: string | null
           colaborador_nome?: string | null
           competencia?: string
@@ -8973,10 +9706,15 @@ export type Database = {
           created_at?: string
           data_limite?: string
           descricao?: string
+          empresa_id?: string | null
+          faixa?: string | null
           id?: string
+          plano_acao_id?: string | null
+          severidade?: string
           status?: string
           tenant_id?: string
           tipo?: string
+          updated_at?: string
           valor_referencia?: number | null
         }
         Relationships: [
@@ -9124,6 +9862,7 @@ export type Database = {
           dias_gozo: number
           em_dobro: boolean | null
           id: string
+          media_origem: string
           media_variaveis: number | null
           memoria_calculo: Json | null
           periodo_aquisitivo_fim: string
@@ -9160,6 +9899,7 @@ export type Database = {
           dias_gozo?: number
           em_dobro?: boolean | null
           id?: string
+          media_origem?: string
           media_variaveis?: number | null
           memoria_calculo?: Json | null
           periodo_aquisitivo_fim: string
@@ -9196,6 +9936,7 @@ export type Database = {
           dias_gozo?: number
           em_dobro?: boolean | null
           id?: string
+          media_origem?: string
           media_variaveis?: number | null
           memoria_calculo?: Json | null
           periodo_aquisitivo_fim?: string
@@ -9889,6 +10630,7 @@ export type Database = {
           created_at: string
           descricao: string
           forma_calculo: Database["public"]["Enums"]["forma_calculo"]
+          he_do_ponto: boolean
           id: string
           incide_13: boolean
           incide_ferias: boolean
@@ -9912,6 +10654,7 @@ export type Database = {
           created_at?: string
           descricao: string
           forma_calculo?: Database["public"]["Enums"]["forma_calculo"]
+          he_do_ponto?: boolean
           id?: string
           incide_13?: boolean
           incide_ferias?: boolean
@@ -9935,6 +10678,7 @@ export type Database = {
           created_at?: string
           descricao?: string
           forma_calculo?: Database["public"]["Enums"]["forma_calculo"]
+          he_do_ponto?: boolean
           id?: string
           incide_13?: boolean
           incide_ferias?: boolean
@@ -13155,6 +13899,7 @@ export type Database = {
           num_funcionarios: string | null
           perfil_diagnostico: string | null
           pontuacao_diagnostico: number | null
+          ref_codigo: string | null
           setor: string | null
           telefone: string | null
           updated_at: string | null
@@ -13174,6 +13919,7 @@ export type Database = {
           num_funcionarios?: string | null
           perfil_diagnostico?: string | null
           pontuacao_diagnostico?: number | null
+          ref_codigo?: string | null
           setor?: string | null
           telefone?: string | null
           updated_at?: string | null
@@ -13193,6 +13939,7 @@ export type Database = {
           num_funcionarios?: string | null
           perfil_diagnostico?: string | null
           pontuacao_diagnostico?: number | null
+          ref_codigo?: string | null
           setor?: string | null
           telefone?: string | null
           updated_at?: string | null
@@ -13267,17 +14014,22 @@ export type Database = {
       }
       leads: {
         Row: {
+          atribuicao: string | null
           cargo: string | null
+          cidade: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
           email: string | null
           empresa: string | null
           id: string
+          implantador_parceiro_id: string | null
           landing_lead_id: string | null
           nome: string
           notas: string | null
           origem: Database["public"]["Enums"]["lead_origem"]
+          parceiro_id: string | null
+          parceiro_link_id: string | null
           proxima_acao_data: string | null
           proxima_acao_descricao: string | null
           responsavel_id: string | null
@@ -13285,22 +14037,28 @@ export type Database = {
           tags: string[] | null
           telefone: string | null
           tenant_convertido_id: string | null
+          uf: string | null
           ultimo_contato_at: string | null
           updated_at: string
           valor_estimado: number | null
         }
         Insert: {
+          atribuicao?: string | null
           cargo?: string | null
+          cidade?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           email?: string | null
           empresa?: string | null
           id?: string
+          implantador_parceiro_id?: string | null
           landing_lead_id?: string | null
           nome: string
           notas?: string | null
           origem?: Database["public"]["Enums"]["lead_origem"]
+          parceiro_id?: string | null
+          parceiro_link_id?: string | null
           proxima_acao_data?: string | null
           proxima_acao_descricao?: string | null
           responsavel_id?: string | null
@@ -13308,22 +14066,28 @@ export type Database = {
           tags?: string[] | null
           telefone?: string | null
           tenant_convertido_id?: string | null
+          uf?: string | null
           ultimo_contato_at?: string | null
           updated_at?: string
           valor_estimado?: number | null
         }
         Update: {
+          atribuicao?: string | null
           cargo?: string | null
+          cidade?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           email?: string | null
           empresa?: string | null
           id?: string
+          implantador_parceiro_id?: string | null
           landing_lead_id?: string | null
           nome?: string
           notas?: string | null
           origem?: Database["public"]["Enums"]["lead_origem"]
+          parceiro_id?: string | null
+          parceiro_link_id?: string | null
           proxima_acao_data?: string | null
           proxima_acao_descricao?: string | null
           responsavel_id?: string | null
@@ -13331,11 +14095,19 @@ export type Database = {
           tags?: string[] | null
           telefone?: string | null
           tenant_convertido_id?: string | null
+          uf?: string | null
           ultimo_contato_at?: string | null
           updated_at?: string
           valor_estimado?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "leads_implantador_parceiro_id_fkey"
+            columns: ["implantador_parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "leads_landing_lead_id_fkey"
             columns: ["landing_lead_id"]
@@ -13344,10 +14116,71 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "leads_parceiro_id_fkey"
+            columns: ["parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_parceiro_link_id_fkey"
+            columns: ["parceiro_link_id"]
+            isOneToOne: false
+            referencedRelation: "parceiro_links"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "leads_tenant_convertido_id_fkey"
             columns: ["tenant_convertido_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads_integracoes_eventos: {
+        Row: {
+          campanha: string | null
+          erro: string | null
+          external_id: string
+          form_id: string | null
+          id: number
+          lead_id: string | null
+          origem: string
+          payload: Json
+          recebido_em: string
+          status: string
+        }
+        Insert: {
+          campanha?: string | null
+          erro?: string | null
+          external_id: string
+          form_id?: string | null
+          id?: number
+          lead_id?: string | null
+          origem?: string
+          payload?: Json
+          recebido_em?: string
+          status?: string
+        }
+        Update: {
+          campanha?: string | null
+          erro?: string | null
+          external_id?: string
+          form_id?: string | null
+          id?: number
+          lead_id?: string | null
+          origem?: string
+          payload?: Json
+          recebido_em?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_integracoes_eventos_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
             referencedColumns: ["id"]
           },
         ]
@@ -16341,6 +17174,551 @@ export type Database = {
           },
         ]
       }
+      parceiro_comissoes: {
+        Row: {
+          base_cents: number
+          competencia: string
+          created_at: string
+          evento: string | null
+          fechado_em: string | null
+          id: string
+          observacao: string | null
+          pago_em: string | null
+          parceiro_id: string
+          percentual: number | null
+          status: string
+          tenant_id: string | null
+          tipo: string
+          valor_cents: number
+        }
+        Insert: {
+          base_cents?: number
+          competencia: string
+          created_at?: string
+          evento?: string | null
+          fechado_em?: string | null
+          id?: string
+          observacao?: string | null
+          pago_em?: string | null
+          parceiro_id: string
+          percentual?: number | null
+          status?: string
+          tenant_id?: string | null
+          tipo?: string
+          valor_cents?: number
+        }
+        Update: {
+          base_cents?: number
+          competencia?: string
+          created_at?: string
+          evento?: string | null
+          fechado_em?: string | null
+          id?: string
+          observacao?: string | null
+          pago_em?: string | null
+          parceiro_id?: string
+          percentual?: number | null
+          status?: string
+          tenant_id?: string | null
+          tipo?: string
+          valor_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parceiro_comissoes_parceiro_id_fkey"
+            columns: ["parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parceiro_comissoes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parceiro_contratos_aceites: {
+        Row: {
+          aceito_em: string
+          hash_texto: string
+          id: string
+          ip: string | null
+          parceiro_id: string
+          user_agent: string | null
+          user_id: string | null
+          versao: number
+        }
+        Insert: {
+          aceito_em?: string
+          hash_texto: string
+          id?: string
+          ip?: string | null
+          parceiro_id: string
+          user_agent?: string | null
+          user_id?: string | null
+          versao: number
+        }
+        Update: {
+          aceito_em?: string
+          hash_texto?: string
+          id?: string
+          ip?: string | null
+          parceiro_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parceiro_contratos_aceites_parceiro_id_fkey"
+            columns: ["parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parceiro_contratos_aceites_versao_fkey"
+            columns: ["versao"]
+            isOneToOne: false
+            referencedRelation: "parceiro_contratos_versoes"
+            referencedColumns: ["versao"]
+          },
+        ]
+      }
+      parceiro_contratos_versoes: {
+        Row: {
+          hash_texto: string
+          html: string
+          publicado_em: string
+          publicado_por: string | null
+          titulo: string
+          versao: number
+          vigente: boolean
+        }
+        Insert: {
+          hash_texto: string
+          html: string
+          publicado_em?: string
+          publicado_por?: string | null
+          titulo: string
+          versao: number
+          vigente?: boolean
+        }
+        Update: {
+          hash_texto?: string
+          html?: string
+          publicado_em?: string
+          publicado_por?: string | null
+          titulo?: string
+          versao?: number
+          vigente?: boolean
+        }
+        Relationships: []
+      }
+      parceiro_eventos_remuneracao: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          evento: string
+          id: string
+          percentual_primeira_mensalidade: number
+          percentual_setup: number
+          tipo_parceiro: string
+          trilha: string
+          valor_fixo_cents: number
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          evento: string
+          id?: string
+          percentual_primeira_mensalidade?: number
+          percentual_setup?: number
+          tipo_parceiro: string
+          trilha?: string
+          valor_fixo_cents?: number
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          evento?: string
+          id?: string
+          percentual_primeira_mensalidade?: number
+          percentual_setup?: number
+          tipo_parceiro?: string
+          trilha?: string
+          valor_fixo_cents?: number
+        }
+        Relationships: []
+      }
+      parceiro_link_cliques: {
+        Row: {
+          clicado_em: string
+          id: number
+          link_id: string
+          ua_hash: string | null
+        }
+        Insert: {
+          clicado_em?: string
+          id?: number
+          link_id: string
+          ua_hash?: string | null
+        }
+        Update: {
+          clicado_em?: string
+          id?: number
+          link_id?: string
+          ua_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parceiro_link_cliques_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "parceiro_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parceiro_links: {
+        Row: {
+          ativo: boolean
+          campanha: string
+          codigo: string
+          created_at: string
+          id: string
+          parceiro_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          campanha?: string
+          codigo: string
+          created_at?: string
+          id?: string
+          parceiro_id: string
+        }
+        Update: {
+          ativo?: boolean
+          campanha?: string
+          codigo?: string
+          created_at?: string
+          id?: string
+          parceiro_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parceiro_links_parceiro_id_fkey"
+            columns: ["parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parceiro_mrr_snapshots: {
+        Row: {
+          competencia: string
+          criado_em: string
+          estagio: string | null
+          mrr_cents: number
+          papel: string | null
+          parceiro_id: string
+          tenant_id: string
+          tenant_nome: string | null
+        }
+        Insert: {
+          competencia: string
+          criado_em?: string
+          estagio?: string | null
+          mrr_cents?: number
+          papel?: string | null
+          parceiro_id: string
+          tenant_id: string
+          tenant_nome?: string | null
+        }
+        Update: {
+          competencia?: string
+          criado_em?: string
+          estagio?: string | null
+          mrr_cents?: number
+          papel?: string | null
+          parceiro_id?: string
+          tenant_id?: string
+          tenant_nome?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parceiro_mrr_snapshots_parceiro_id_fkey"
+            columns: ["parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parceiro_mrr_snapshots_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parceiro_niveis: {
+        Row: {
+          ativo: boolean
+          beneficios: string | null
+          bonus_renovacao_multiplicador: number
+          created_at: string
+          id: string
+          mrr_maximo_cents: number | null
+          mrr_minimo_cents: number
+          nome: string
+          ordem: number
+          percentual_casa: number
+          percentual_link: number
+          setup_participacao_pct: number
+          trilha: string
+        }
+        Insert: {
+          ativo?: boolean
+          beneficios?: string | null
+          bonus_renovacao_multiplicador?: number
+          created_at?: string
+          id?: string
+          mrr_maximo_cents?: number | null
+          mrr_minimo_cents?: number
+          nome: string
+          ordem?: number
+          percentual_casa?: number
+          percentual_link?: number
+          setup_participacao_pct?: number
+          trilha: string
+        }
+        Update: {
+          ativo?: boolean
+          beneficios?: string | null
+          bonus_renovacao_multiplicador?: number
+          created_at?: string
+          id?: string
+          mrr_maximo_cents?: number | null
+          mrr_minimo_cents?: number
+          nome?: string
+          ordem?: number
+          percentual_casa?: number
+          percentual_link?: number
+          setup_participacao_pct?: number
+          trilha?: string
+        }
+        Relationships: []
+      }
+      parceiro_programa_config: {
+        Row: {
+          atualizado_em: string
+          atualizado_por: string | null
+          chave: string
+          descricao: string | null
+          grupo: string
+          ordem: number
+          rotulo: string
+          tipo: string
+          valor: string
+        }
+        Insert: {
+          atualizado_em?: string
+          atualizado_por?: string | null
+          chave: string
+          descricao?: string | null
+          grupo: string
+          ordem?: number
+          rotulo: string
+          tipo?: string
+          valor: string
+        }
+        Update: {
+          atualizado_em?: string
+          atualizado_por?: string | null
+          chave?: string
+          descricao?: string | null
+          grupo?: string
+          ordem?: number
+          rotulo?: string
+          tipo?: string
+          valor?: string
+        }
+        Relationships: []
+      }
+      parceiro_usuarios: {
+        Row: {
+          created_at: string
+          papel: string
+          parceiro_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          papel?: string
+          parceiro_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          papel?: string
+          parceiro_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parceiro_usuarios_parceiro_id_fkey"
+            columns: ["parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parceiros: {
+        Row: {
+          aceite_termos_em: string | null
+          aprovacao: string
+          aprovado_em: string | null
+          aprovado_por: string | null
+          cep: string | null
+          certificacao_nivel: number
+          cidade: string | null
+          codigo: string
+          created_at: string
+          created_by: string | null
+          documento: string | null
+          email: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          marketplace_profissional_id: string | null
+          master_parceiro_id: string | null
+          master_regional: boolean
+          motivo_recusa: string | null
+          nivel_conquistado_em: string | null
+          nivel_id: string | null
+          nome: string
+          observacoes: string | null
+          parceiro_desde: string
+          percentual_comissao: number | null
+          pix_chave: string | null
+          raio_atuacao_km: number
+          status: string
+          telefone: string | null
+          tipo_parceiro: string
+          tipo_pessoa: string
+          trilha: string | null
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          aceite_termos_em?: string | null
+          aprovacao?: string
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          cep?: string | null
+          certificacao_nivel?: number
+          cidade?: string | null
+          codigo: string
+          created_at?: string
+          created_by?: string | null
+          documento?: string | null
+          email?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          marketplace_profissional_id?: string | null
+          master_parceiro_id?: string | null
+          master_regional?: boolean
+          motivo_recusa?: string | null
+          nivel_conquistado_em?: string | null
+          nivel_id?: string | null
+          nome: string
+          observacoes?: string | null
+          parceiro_desde?: string
+          percentual_comissao?: number | null
+          pix_chave?: string | null
+          raio_atuacao_km?: number
+          status?: string
+          telefone?: string | null
+          tipo_parceiro?: string
+          tipo_pessoa?: string
+          trilha?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          aceite_termos_em?: string | null
+          aprovacao?: string
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          cep?: string | null
+          certificacao_nivel?: number
+          cidade?: string | null
+          codigo?: string
+          created_at?: string
+          created_by?: string | null
+          documento?: string | null
+          email?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          marketplace_profissional_id?: string | null
+          master_parceiro_id?: string | null
+          master_regional?: boolean
+          motivo_recusa?: string | null
+          nivel_conquistado_em?: string | null
+          nivel_id?: string | null
+          nome?: string
+          observacoes?: string | null
+          parceiro_desde?: string
+          percentual_comissao?: number | null
+          pix_chave?: string | null
+          raio_atuacao_km?: number
+          status?: string
+          telefone?: string | null
+          tipo_parceiro?: string
+          tipo_pessoa?: string
+          trilha?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parceiros_marketplace_profissional_id_fkey"
+            columns: ["marketplace_profissional_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_profissionais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parceiros_marketplace_profissional_id_fkey"
+            columns: ["marketplace_profissional_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_profissionais_publico"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parceiros_master_parceiro_id_fkey"
+            columns: ["master_parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parceiros_nivel_id_fkey"
+            columns: ["nivel_id"]
+            isOneToOne: false
+            referencedRelation: "parceiro_niveis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pdi_acoes: {
         Row: {
           created_at: string
@@ -17406,6 +18784,86 @@ export type Database = {
           },
         ]
       }
+      plan_entitlements: {
+        Row: {
+          feature_key: string
+          id: string
+          is_enabled: boolean
+          is_unlimited: boolean
+          limit_value: number | null
+          plan_id: string
+        }
+        Insert: {
+          feature_key: string
+          id?: string
+          is_enabled?: boolean
+          is_unlimited?: boolean
+          limit_value?: number | null
+          plan_id: string
+        }
+        Update: {
+          feature_key?: string
+          id?: string
+          is_enabled?: boolean
+          is_unlimited?: boolean
+          limit_value?: number | null
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_entitlements_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "plan_entitlements_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_prices: {
+        Row: {
+          amount_cents: number | null
+          created_at: string
+          currency: string
+          id: string
+          is_active: boolean
+          period: string
+          plan_id: string
+        }
+        Insert: {
+          amount_cents?: number | null
+          created_at?: string
+          currency?: string
+          id?: string
+          is_active?: boolean
+          period?: string
+          plan_id: string
+        }
+        Update: {
+          amount_cents?: number | null
+          created_at?: string
+          currency?: string
+          id?: string
+          is_active?: boolean
+          period?: string
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_prices_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plano_acoes: {
         Row: {
           arquivada: boolean
@@ -18000,6 +19458,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      plans: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          name: string
+          status: string
+          tier: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          name: string
+          status?: string
+          tier?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          name?: string
+          status?: string
+          tier?: number
+        }
+        Relationships: []
       }
       ponto_acesso_sensivel_log: {
         Row: {
@@ -22543,6 +24034,27 @@ export type Database = {
         }
         Relationships: []
       }
+      qa_agendamento_e2e_dias: {
+        Row: {
+          dia_semana: number
+          hora: number
+          ligado: boolean
+          minuto: number
+        }
+        Insert: {
+          dia_semana: number
+          hora?: number
+          ligado?: boolean
+          minuto?: number
+        }
+        Update: {
+          dia_semana?: number
+          hora?: number
+          ligado?: boolean
+          minuto?: number
+        }
+        Relationships: []
+      }
       qa_casos_teste: {
         Row: {
           base_legal: string | null
@@ -23377,6 +24889,181 @@ export type Database = {
           },
         ]
       }
+      subscription_addons: {
+        Row: {
+          ativo: boolean
+          contratado_em: string
+          created_by: string | null
+          feature_key: string
+          id: string
+          kind: string
+          quantity: number
+          tenant_id: string
+          unit_price_cents: number
+        }
+        Insert: {
+          ativo?: boolean
+          contratado_em?: string
+          created_by?: string | null
+          feature_key: string
+          id?: string
+          kind: string
+          quantity?: number
+          tenant_id: string
+          unit_price_cents?: number
+        }
+        Update: {
+          ativo?: boolean
+          contratado_em?: string
+          created_by?: string | null
+          feature_key?: string
+          id?: string
+          kind?: string
+          quantity?: number
+          tenant_id?: string
+          unit_price_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_addons_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      subscription_overrides: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          feature_key: string
+          id: string
+          is_enabled: boolean | null
+          is_unlimited: boolean | null
+          limit_value: number | null
+          reason: string | null
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          feature_key: string
+          id?: string
+          is_enabled?: boolean | null
+          is_unlimited?: boolean | null
+          limit_value?: number | null
+          reason?: string | null
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          feature_key?: string
+          id?: string
+          is_enabled?: boolean | null
+          is_unlimited?: boolean | null
+          limit_value?: number | null
+          reason?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_overrides_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          cancelado_em: string | null
+          ciclo_fim: string | null
+          ciclo_inicio: string | null
+          ciclo_meses: number | null
+          contrato_assinado_em: string | null
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          desconto_pct: number
+          go_live_homologado_em: string | null
+          id: string
+          payment_confirmed: boolean
+          plan_id: string
+          primeira_mensalidade_compensada_em: string | null
+          setup_valor_cents: number
+          status: string
+          tenant_id: string
+          terceira_mensalidade_compensada_em: string | null
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          cancelado_em?: string | null
+          ciclo_fim?: string | null
+          ciclo_inicio?: string | null
+          ciclo_meses?: number | null
+          contrato_assinado_em?: string | null
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          desconto_pct?: number
+          go_live_homologado_em?: string | null
+          id?: string
+          payment_confirmed?: boolean
+          plan_id: string
+          primeira_mensalidade_compensada_em?: string | null
+          setup_valor_cents?: number
+          status?: string
+          tenant_id: string
+          terceira_mensalidade_compensada_em?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cancelado_em?: string | null
+          ciclo_fim?: string | null
+          ciclo_inicio?: string | null
+          ciclo_meses?: number | null
+          contrato_assinado_em?: string | null
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          desconto_pct?: number
+          go_live_homologado_em?: string | null
+          id?: string
+          payment_confirmed?: boolean
+          plan_id?: string
+          primeira_mensalidade_compensada_em?: string | null
+          setup_valor_cents?: number
+          status?: string
+          tenant_id?: string
+          terceira_mensalidade_compensada_em?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_subscriptions_tenant"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       superadmins: {
         Row: {
           ativo: boolean
@@ -23645,8 +25332,12 @@ export type Database = {
           configuracoes: Json | null
           created_at: string
           id: string
+          implantador_parceiro_id: string | null
           logo_url: string | null
           nome: string
+          originado_em: string | null
+          parceiro_id: string | null
+          parceiro_link_id: string | null
           plano: Database["public"]["Enums"]["tenant_plan"]
           slug: string
           updated_at: string
@@ -23656,8 +25347,12 @@ export type Database = {
           configuracoes?: Json | null
           created_at?: string
           id?: string
+          implantador_parceiro_id?: string | null
           logo_url?: string | null
           nome: string
+          originado_em?: string | null
+          parceiro_id?: string | null
+          parceiro_link_id?: string | null
           plano?: Database["public"]["Enums"]["tenant_plan"]
           slug: string
           updated_at?: string
@@ -23667,13 +25362,39 @@ export type Database = {
           configuracoes?: Json | null
           created_at?: string
           id?: string
+          implantador_parceiro_id?: string | null
           logo_url?: string | null
           nome?: string
+          originado_em?: string | null
+          parceiro_id?: string | null
+          parceiro_link_id?: string | null
           plano?: Database["public"]["Enums"]["tenant_plan"]
           slug?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tenants_implantador_parceiro_id_fkey"
+            columns: ["implantador_parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenants_parceiro_id_fkey"
+            columns: ["parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "parceiros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenants_parceiro_link_id_fkey"
+            columns: ["parceiro_link_id"]
+            isOneToOne: false
+            referencedRelation: "parceiro_links"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       terceiro_audit_log: {
         Row: {
@@ -24686,6 +26407,41 @@ export type Database = {
           },
         ]
       }
+      usage_counters: {
+        Row: {
+          feature_key: string
+          id: string
+          period_start: string
+          tenant_id: string
+          updated_at: string
+          used_value: number
+        }
+        Insert: {
+          feature_key: string
+          id?: string
+          period_start?: string
+          tenant_id: string
+          updated_at?: string
+          used_value?: number
+        }
+        Update: {
+          feature_key?: string
+          id?: string
+          period_start?: string
+          tenant_id?: string
+          updated_at?: string
+          used_value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_counters_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -25128,6 +26884,90 @@ export type Database = {
           submodulo?: string | null
           titulo?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      youreyes_empresa: {
+        Row: {
+          atualizado_em: string
+          atualizado_por: string | null
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          cnpj: string | null
+          complemento: string | null
+          email_contato: string
+          email_financeiro: string | null
+          endereco: string | null
+          foro_comarca: string | null
+          id: number
+          inscricao_estadual: string | null
+          inscricao_municipal: string | null
+          nome_fantasia: string
+          numero: string | null
+          observacoes: string | null
+          razao_social: string
+          regime_tributario: string | null
+          representante_cargo: string | null
+          representante_cpf: string | null
+          representante_nome: string | null
+          site: string
+          telefone: string | null
+          uf: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          atualizado_por?: string | null
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          complemento?: string | null
+          email_contato?: string
+          email_financeiro?: string | null
+          endereco?: string | null
+          foro_comarca?: string | null
+          id?: number
+          inscricao_estadual?: string | null
+          inscricao_municipal?: string | null
+          nome_fantasia?: string
+          numero?: string | null
+          observacoes?: string | null
+          razao_social?: string
+          regime_tributario?: string | null
+          representante_cargo?: string | null
+          representante_cpf?: string | null
+          representante_nome?: string | null
+          site?: string
+          telefone?: string | null
+          uf?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          atualizado_por?: string | null
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          complemento?: string | null
+          email_contato?: string
+          email_financeiro?: string | null
+          endereco?: string | null
+          foro_comarca?: string | null
+          id?: number
+          inscricao_estadual?: string | null
+          inscricao_municipal?: string | null
+          nome_fantasia?: string
+          numero?: string | null
+          observacoes?: string | null
+          razao_social?: string
+          regime_tributario?: string | null
+          representante_cargo?: string | null
+          representante_cpf?: string | null
+          representante_nome?: string | null
+          site?: string
+          telefone?: string | null
+          uf?: string | null
         }
         Relationships: []
       }
@@ -25770,6 +27610,144 @@ export type Database = {
       cpf_do_usuario_logado: { Args: never; Returns: string }
       cpf_valido: { Args: { p_cpf: string }; Returns: boolean }
       current_user_tenant_id: { Args: never; Returns: string }
+      decimo_terceiro_adiantamento_nas_ferias: {
+        Args: { p_ano: number; p_tenant: string }
+        Returns: Json
+      }
+      decimo_terceiro_alerta_gerar_acao: {
+        Args: {
+          p_alerta_id: string
+          p_responsavel_id?: string
+          p_responsavel_nome?: string
+        }
+        Returns: string
+      }
+      decimo_terceiro_alertas_varrer: {
+        Args: { p_ano?: number; p_tenant?: string }
+        Returns: Json
+      }
+      decimo_terceiro_aprovar: {
+        Args: { p_calculo: string; p_nome?: string }
+        Returns: Json
+      }
+      decimo_terceiro_apurar: {
+        Args: {
+          p_ano: number
+          p_cpf: string
+          p_empresa?: string
+          p_salario?: number
+          p_tenant: string
+        }
+        Returns: Json
+      }
+      decimo_terceiro_avos: {
+        Args: {
+          p_ano: number
+          p_cpf: string
+          p_empresa?: string
+          p_tenant: string
+        }
+        Returns: Json
+      }
+      decimo_terceiro_calcular: {
+        Args: {
+          p_ano: number
+          p_cpf: string
+          p_dependentes?: number
+          p_empresa?: string
+          p_parcela: number
+          p_primeira?: number
+          p_tenant: string
+          p_tipo_vinculo?: string
+        }
+        Returns: Json
+      }
+      decimo_terceiro_conciliar_provisao: {
+        Args: { p_ano: number; p_tenant: string }
+        Returns: Json
+      }
+      decimo_terceiro_da_rescisao: {
+        Args: { p_rescisao: string }
+        Returns: Json
+      }
+      decimo_terceiro_esocial_gerar: {
+        Args: {
+          p_ano: number
+          p_leiaute?: string
+          p_tenant: string
+          p_tipo?: string
+        }
+        Returns: Json
+      }
+      decimo_terceiro_esocial_validar: {
+        Args: { p_ano: number; p_tenant: string }
+        Returns: Json
+      }
+      decimo_terceiro_inss: {
+        Args: { p_base: number; p_data_ref?: string; p_tenant?: string }
+        Returns: Json
+      }
+      decimo_terceiro_irrf: {
+        Args: {
+          p_base: number
+          p_data_ref?: string
+          p_dependentes?: number
+          p_tenant?: string
+        }
+        Returns: Json
+      }
+      decimo_terceiro_lote: {
+        Args: {
+          p_ano: number
+          p_empresa?: string
+          p_parcela: number
+          p_tenant: string
+        }
+        Returns: Json
+      }
+      decimo_terceiro_media_horas_extras: {
+        Args: {
+          p_ano: number
+          p_avos: number
+          p_cpf: string
+          p_empresa?: string
+          p_salario: number
+          p_tenant: string
+        }
+        Returns: Json
+      }
+      decimo_terceiro_media_variaveis: {
+        Args: {
+          p_ano: number
+          p_avos?: number
+          p_cpf: string
+          p_empresa?: string
+          p_excluir_he_do_ponto?: boolean
+          p_tenant: string
+        }
+        Returns: Json
+      }
+      decimo_terceiro_pagar: {
+        Args: { p_calculo: string; p_data?: string }
+        Returns: Json
+      }
+      decimo_terceiro_prazo_legal: {
+        Args: {
+          p_ano: number
+          p_municipio?: string
+          p_parcela: number
+          p_uf?: string
+        }
+        Returns: string
+      }
+      decimo_terceiro_provisionar: {
+        Args: { p_competencia: string; p_tenant?: string }
+        Returns: Json
+      }
+      decimo_terceiro_reabrir: {
+        Args: { p_calculo: string; p_motivo: string }
+        Returns: Json
+      }
       delete_empresa_segura: { Args: { _empresa_id: string }; Returns: Json }
       desconsiderar_marcacao_ponto: {
         Args: { p_marcacao_id: string; p_motivo?: string }
@@ -25782,6 +27760,42 @@ export type Database = {
       ensure_admissao_documentos_by_token: {
         Args: { _token: string }
         Returns: number
+      }
+      entitlement_apply_policies: {
+        Args: never
+        Returns: {
+          status: string
+          stmt: string
+          table_name: string
+        }[]
+      }
+      entitlement_build_statements: {
+        Args: never
+        Returns: {
+          stmt: string
+          table_name: string
+        }[]
+      }
+      entitlement_can_use: {
+        Args: { p_current_usage?: number; p_feature: string; p_tenant: string }
+        Returns: {
+          allowed: boolean
+          limit_value: number
+          reason: string
+          remaining: number
+          used: number
+        }[]
+      }
+      entitlement_my_features: { Args: never; Returns: string[] }
+      entitlement_my_plan: { Args: never; Returns: Json }
+      entitlement_resolve: {
+        Args: { p_feature: string; p_tenant: string }
+        Returns: {
+          available: boolean
+          is_unlimited: boolean
+          limit_value: number
+          source: string
+        }[]
       }
       epi_atualizar_estoque_local_otimista: {
         Args: {
@@ -25848,9 +27862,58 @@ export type Database = {
           origem: string
         }[]
       }
+      ferias_alerta_gerar_acao: {
+        Args: {
+          p_alerta_id: string
+          p_prazo_dias?: number
+          p_responsavel_id?: string
+          p_responsavel_nome?: string
+        }
+        Returns: string
+      }
+      ferias_alertas_varrer: { Args: { p_tenant?: string }; Returns: number }
+      ferias_art140_calc: {
+        Args: { p_admissao: string; p_referencia: string }
+        Returns: {
+          art_140: boolean
+          dias_proporcionais: number
+          meses: number
+        }[]
+      }
+      ferias_aviso_tem_ciencia: {
+        Args: { p_solicitacao: string }
+        Returns: boolean
+      }
+      ferias_coletiva_abrir_comunicados: {
+        Args: { p_coletiva: string }
+        Returns: number
+      }
+      ferias_coletiva_afetados: {
+        Args: { p_coletiva: string }
+        Returns: {
+          art_140: boolean
+          colaborador_cpf: string
+          colaborador_nome: string
+          data_admissao: string
+          dias_proporcionais: number
+          meses_de_casa: number
+        }[]
+      }
       ferias_dias_por_faltas_clt: {
         Args: { p_faltas: number }
         Returns: number
+      }
+      ferias_esocial_gerar: { Args: { p_calculo: string }; Returns: number }
+      ferias_esocial_interpretar_retorno: {
+        Args: { p_codigo: string; p_mensagem?: string; p_transmissao: string }
+        Returns: string
+      }
+      ferias_esocial_validar: {
+        Args: { p_calculo: string }
+        Returns: {
+          ok: boolean
+          problemas: string[]
+        }[]
       }
       ferias_faltas_do_ponto: {
         Args: {
@@ -25859,6 +27922,21 @@ export type Database = {
           p_inicio: string
           p_tenant_id: string
         }
+        Returns: number
+      }
+      ferias_media_variaveis: {
+        Args: {
+          p_aquisitivo_fim: string
+          p_aquisitivo_inicio: string
+          p_cpf: string
+          p_empresa?: string
+          p_inicio_gozo?: string
+          p_tenant: string
+        }
+        Returns: Json
+      }
+      ferias_periodo_dias: {
+        Args: { p_fim: string; p_ini: string }
         Returns: number
       }
       ferias_recalcular_empresa: {
@@ -26058,6 +28136,15 @@ export type Database = {
         Returns: undefined
       }
       is_superadmin: { Args: { _user_id: string }; Returns: boolean }
+      leads_receber_meta: {
+        Args: {
+          _campanha: string
+          _external_id: string
+          _form_id: string
+          _payload: Json
+        }
+        Returns: Json
+      }
       list_entrevista_mensagens_by_token: {
         Args: { p_token: string }
         Returns: {
@@ -26081,12 +28168,94 @@ export type Database = {
         Args: { p_cpf: string; p_dias?: number; p_token: string }
         Returns: Json
       }
+      log_entitlement_denial: {
+        Args: { p_context?: string; p_feature: string; p_tenant: string }
+        Returns: undefined
+      }
+      my_cancelar_addon: { Args: { _feature_key: string }; Returns: undefined }
+      my_contratar_addon: {
+        Args: { _feature_key: string; _quantity?: number }
+        Returns: undefined
+      }
       obter_assinatura_manual_publica: {
         Args: { p_token: string }
         Returns: Json
       }
       obter_contrato_publico: { Args: { _token: string }; Returns: Json }
       obter_ordem_servico_publica: { Args: { p_token: string }; Returns: Json }
+      parceiro_aceitar_contrato: {
+        Args: { _user_agent?: string }
+        Returns: Json
+      }
+      parceiro_atribuir_tenant_por_ref: {
+        Args: { p_codigo: string; p_tenant_id: string }
+        Returns: boolean
+      }
+      parceiro_base_tenant: { Args: { p_tenant_id: string }; Returns: number }
+      parceiro_cadastrar: { Args: { _dados: Json }; Returns: Json }
+      parceiro_cfg: {
+        Args: { p_chave: string; p_default?: number }
+        Returns: number
+      }
+      parceiro_contrato_iniciar_assinatura: { Args: never; Returns: Json }
+      parceiro_contrato_iniciar_assinatura_para: {
+        Args: { p_parceiro_id: string }
+        Returns: Json
+      }
+      parceiro_contrato_modelo_vigente: { Args: never; Returns: string }
+      parceiro_contrato_publico: { Args: never; Returns: Json }
+      parceiro_contrato_render: {
+        Args: { p_html?: string; p_parceiro_id: string }
+        Returns: string
+      }
+      parceiro_contrato_render_abnt: {
+        Args: { p_html?: string; p_parceiro_id: string }
+        Returns: string
+      }
+      parceiro_contrato_situacao: {
+        Args: { p_parceiro_id: string }
+        Returns: Json
+      }
+      parceiro_estagio_calc: {
+        Args: {
+          p_contrato_assinado: boolean
+          p_contrato_enviado?: boolean
+          p_go_live_em: string
+          p_lead_status: string
+          p_onboarding_concluido: boolean
+          p_sub_status: string
+          p_tenant_ativo: boolean
+          p_tenant_existe: boolean
+        }
+        Returns: string
+      }
+      parceiro_estagio_tenant: {
+        Args: { p_tenant_id: string }
+        Returns: string
+      }
+      parceiro_fechar_competencia: {
+        Args: { p_competencia?: string; p_fechar?: boolean }
+        Returns: Json
+      }
+      parceiro_gerar_codigo: { Args: { p_nome: string }; Returns: string }
+      parceiro_meu_id: { Args: never; Returns: string }
+      parceiro_meu_perfil_salvar: { Args: { _dados: Json }; Returns: undefined }
+      parceiro_meu_portal: { Args: never; Returns: Json }
+      parceiro_meu_portal_com_contrato: { Args: never; Returns: Json }
+      parceiro_mrr_tenant: { Args: { p_tenant_id: string }; Returns: number }
+      parceiro_registrar_clique: {
+        Args: { p_codigo: string; p_ua_hash?: string }
+        Returns: boolean
+      }
+      parceiro_resolver_ref: {
+        Args: { p_codigo: string }
+        Returns: {
+          link_id: string
+          parceiro_id: string
+        }[]
+      }
+      parceiro_trilha_padrao: { Args: { p_tipo: string }; Returns: string }
+      parceiros_sugerir_para_lead: { Args: { _lead_id: string }; Returns: Json }
       perfil_padrao_colaborador: {
         Args: { p_tenant_id: string }
         Returns: string
@@ -27043,6 +29212,14 @@ export type Database = {
           sequencia_inicio: string
         }[]
       }
+      ponto_reprocessar_pre_assinalacao: {
+        Args: {
+          p_competencia: string
+          p_empresa_id?: string
+          p_tenant_id: string
+        }
+        Returns: Json
+      }
       ponto_retificar_marcacao: {
         Args: { p_marcacao_id: string; p_motivo: string; p_nova_hora: string }
         Returns: Json
@@ -27205,6 +29382,26 @@ export type Database = {
       proximo_tipo_marcacao_externo_cpf: {
         Args: { p_cpf: string; p_token: string }
         Returns: Json
+      }
+      qa_agendamento_e2e_ler_dias: {
+        Args: never
+        Returns: {
+          dia_nome: string
+          dia_semana: number
+          hora: number
+          ligado: boolean
+          minuto: number
+        }[]
+      }
+      qa_agendamento_e2e_proxima: { Args: never; Returns: string }
+      qa_agendamento_e2e_salvar_dia: {
+        Args: {
+          p_dia: number
+          p_hora: number
+          p_ligado: boolean
+          p_minuto: number
+        }
+        Returns: string
       }
       qa_agendamento_ler: {
         Args: never
@@ -27824,6 +30021,326 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      qa_caso_dec13_001: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_002: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_003: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_004: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_005: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_006: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_020: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_021: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_022: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_023: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_030: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_031: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_032: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_033: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_034: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_035: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_040: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_041: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_042: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_043: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_050: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_051: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_052: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_060: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_061: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_062: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_063: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_070: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_071: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_072: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_073: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_dec13_rescisao_motivo: {
+        Args: {
+          p_cpf: string
+          p_fator: number
+          p_mes: number
+          p_nome: string
+          p_tipo: string
+        }
+        Returns: Json
       }
       qa_caso_dep_001: {
         Args: never
@@ -28542,7 +31059,87 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      qa_caso_ferias_023: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_ferias_033: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_ferias_055: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_ferias_060: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_ferias_061: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_ferias_062: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_ferias_080: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       qa_caso_ferias_081: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_ferias_082: {
         Args: never
         Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
         SetofOptions: {
@@ -29442,6 +32039,136 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      qa_caso_pgp_001: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_002: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_003: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_004: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_005: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_006: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_010: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_011: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_012: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_013: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_014: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_015: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      qa_caso_pgp_016: {
+        Args: never
+        Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
+        SetofOptions: {
+          from: "*"
+          to: "qa_retorno"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       qa_caso_plev_001: {
         Args: never
         Returns: Database["public"]["CompositeTypes"]["qa_retorno"]
@@ -30276,8 +33003,10 @@ export type Database = {
       }
       qa_cpf: { Args: { p_semente: number }; Returns: string }
       qa_cron_sincronizar: { Args: never; Returns: string }
+      qa_cron_sincronizar_e2e: { Args: never; Returns: string }
       qa_dia_util_passado: { Args: { p_atras?: number }; Returns: string }
       qa_disparar_bateria: { Args: { p_modulo?: string }; Returns: string }
+      qa_e2e_disparar_esteira: { Args: never; Returns: undefined }
       qa_empresa: { Args: { p_nome: string }; Returns: string }
       qa_empresa_com_cota: {
         Args: {
@@ -30305,6 +33034,7 @@ export type Database = {
         }
       }
       qa_exigir_modo: { Args: never; Returns: undefined }
+      qa_ferias_sonda_calculo: { Args: { p_tenant: string }; Returns: string }
       qa_fixture_email: {
         Args: { p_codigo: string; p_n: number }
         Returns: string
@@ -30443,6 +33173,7 @@ export type Database = {
         Args: { p_empresa: string; p_subcategoria: string }
         Returns: boolean
       }
+      qa_pgp_cenario: { Args: never; Returns: Record<string, unknown> }
       qa_ponto_admissao: {
         Args: {
           p_cpf_semente: number
@@ -30732,12 +33463,17 @@ export type Database = {
         }
         Returns: Json
       }
+      superadmin_addon_prices_list: { Args: never; Returns: Json }
       superadmin_delete_tenant: {
         Args: { _tenant_id: string }
         Returns: undefined
       }
       superadmin_global_stats: { Args: never; Returns: Json }
       superadmin_growth_series: { Args: { _dias?: number }; Returns: Json }
+      superadmin_lead_encaminhar: {
+        Args: { _lead_id: string; _parceiro_id: string }
+        Returns: undefined
+      }
       superadmin_list_all_empresas: {
         Args: never
         Returns: {
@@ -30759,10 +33495,87 @@ export type Database = {
         Args: { _tenant_id: string }
         Returns: Json
       }
+      superadmin_parceiro_comissao_ajuste: {
+        Args: {
+          _competencia: string
+          _observacao: string
+          _parceiro_id: string
+          _valor_cents: number
+        }
+        Returns: string
+      }
+      superadmin_parceiro_comissao_status: {
+        Args: { _ids: string[]; _observacao?: string; _status: string }
+        Returns: number
+      }
+      superadmin_parceiro_comissoes_list: {
+        Args: { _competencia?: string }
+        Returns: Json
+      }
+      superadmin_parceiro_config_salvar: {
+        Args: { _itens: Json }
+        Returns: number
+      }
+      superadmin_parceiro_contrato_publicar: {
+        Args: { _html: string; _titulo: string }
+        Returns: number
+      }
+      superadmin_parceiro_desvincular_usuario: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
+      superadmin_parceiro_detalhe: {
+        Args: { _parceiro_id: string }
+        Returns: Json
+      }
+      superadmin_parceiro_eventos_salvar: {
+        Args: { _itens: Json }
+        Returns: number
+      }
+      superadmin_parceiro_link_ativo: {
+        Args: { _ativo: boolean; _link_id: string }
+        Returns: undefined
+      }
+      superadmin_parceiro_link_criar: {
+        Args: { _campanha: string; _parceiro_id: string }
+        Returns: string
+      }
+      superadmin_parceiro_niveis_salvar: {
+        Args: { _itens: Json }
+        Returns: number
+      }
+      superadmin_parceiro_salvar: { Args: { _dados: Json }; Returns: string }
+      superadmin_parceiro_status: {
+        Args: { _motivo?: string; _parceiro_id: string; _status: string }
+        Returns: undefined
+      }
+      superadmin_parceiro_vincular_tenant: {
+        Args: {
+          _implantador_id?: string
+          _manter_ausente?: boolean
+          _parceiro_id?: string
+          _tenant_id: string
+        }
+        Returns: undefined
+      }
+      superadmin_parceiro_vincular_usuario: {
+        Args: { _email: string; _parceiro_id: string }
+        Returns: string
+      }
+      superadmin_parceiros_list: { Args: never; Returns: Json }
+      superadmin_parceiros_tenants_list: { Args: never; Returns: Json }
       superadmin_psicossocial_overview: { Args: never; Returns: Json }
+      superadmin_set_addon_price: {
+        Args: { _cents: number; _feature_key: string }
+        Returns: undefined
+      }
       superadmin_set_principal_empresa: {
         Args: { _empresa_id: string; _tenant_id: string }
         Returns: undefined
+      }
+      superadmin_set_tenant_plan: {
+        Args: { _plan_code: string; _tenant_id: string }
+        Returns: string
       }
       superadmin_spinoff_dry_run: {
         Args: { p_empresa_id: string }
@@ -30790,13 +33603,30 @@ export type Database = {
         }
         Returns: Json
       }
+      superadmin_tenant_programa: {
+        Args: { _tenant_id: string }
+        Returns: Json
+      }
+      superadmin_tenant_programa_salvar: {
+        Args: { _dados: Json; _tenant_id: string }
+        Returns: undefined
+      }
       superadmin_tenants_list: { Args: never; Returns: Json }
       superadmin_tenants_status: { Args: never; Returns: Json }
       superadmin_usuarios_global: {
         Args: { _limite?: number; _search?: string }
         Returns: Json
       }
+      superadmin_youreyes_empresa_salvar: {
+        Args: { _dados: Json }
+        Returns: undefined
+      }
       tenant_e_sandbox: { Args: { p_tenant_id: string }; Returns: boolean }
+      tenant_has_feature: {
+        Args: { p_feature: string; p_tenant: string }
+        Returns: boolean
+      }
+      unaccent_safe: { Args: { p: string }; Returns: string }
       update_admissao_documento_by_token: {
         Args: {
           _arquivo_nome: string
@@ -30842,6 +33672,7 @@ export type Database = {
         Returns: string
       }
       youreyes_dispatch_agentes: { Args: never; Returns: undefined }
+      youreyes_empresa_publica: { Args: never; Returns: Json }
     }
     Enums: {
       acao_gut_prioridade: "baixo" | "medio" | "urgente" | "imediato"
@@ -31119,6 +33950,7 @@ export type Database = {
         | "whatsapp"
         | "evento"
         | "outro"
+        | "meta_ads"
       lead_status:
         | "novo"
         | "contatado"
@@ -31405,12 +34237,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -31434,11 +34266,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -31459,11 +34291,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -31484,11 +34316,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -31501,11 +34333,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -31818,6 +34650,7 @@ export const Constants = {
         "whatsapp",
         "evento",
         "outro",
+        "meta_ads",
       ],
       lead_status: [
         "novo",
