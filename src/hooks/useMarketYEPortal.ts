@@ -153,6 +153,11 @@ export function useMarketYEPortal() {
     queryKey: ["marketye-portal", user?.id],
     queryFn: () => rpc("marketye_meu_portal") as Promise<PortalDados | null>,
     enabled: !!user && !!especialistaId,
+    // Conversa nova aberta por uma empresa precisa aparecer sem a pessoa
+    // recarregar a página: a consulta padrão do app não reconsulta ao voltar à
+    // aba nem por tempo, e o portal ficava mostrando a lista antiga.
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
   });
 
   const salvarPerfil = useMutation({

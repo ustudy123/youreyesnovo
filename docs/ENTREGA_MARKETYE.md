@@ -60,6 +60,16 @@ migration 20260911223000 (semente silenciosa) fica como estava.
 `cypress/e2e/marketye.cy.ts`); módulo `rede-parceiros` renomeado para MarketYE
 na Documentação de testes. Casos PARC-001/002/004/024 atualizados.
 
+## Correções de 12/09/2026 (achadas no ambiente de teste)
+
+| Sintoma | Causa | Correção |
+|---|---|---|
+| Cadastro de especialista pelo formulário da vitrine dava erro, mas o cadastro aparecia depois; os anexos não ficavam gravados | O perfil era criado pela função do sistema e, em seguida, o envio dos documentos era recusado pelo Storage: a política do bucket `marketplace-docs` exige que a primeira pasta do caminho seja o **id do especialista**, e a tela mandava o id do usuário. O registro na tabela também não conferia erro. | Caminho corrigido (`<especialista>/<categoria>/<arquivo>`, em `src/lib/marketyeAnexos.ts`), erro de registro tratado, e a segunda tentativa **reaproveita o cadastro** que já existia (envia só os anexos, sem duplicar). `arquivo_url` passa a guardar o caminho no bucket. |
+| Documentos não abriam na aprovação de cadastros | O bucket é privado e a URL "pública" guardada não abre; o superadmin também não tinha política de leitura | Painel de moderação abre cada documento por **link assinado** (2 min); migration `20260912013000` (script `docs/script_marketye_anexos_fotos.sql`) dá leitura ao superadmin e cria o bucket público `marketplace-fotos` para a foto de perfil. A mesma migration **retira** a leitura que qualquer admin de empresa cliente tinha sobre os documentos pessoais de todos os especialistas. |
+| Mensagem enviada pela empresa não aparecia na tela do prestador | A lista de conversas do portal (e a da empresa) só era consultada uma vez e não recarregava ao voltar à aba | Listas reconsultadas a cada 30 s e ao voltar à aba; botão **Atualizar** na aba Conversas do portal. |
+| "OPENAI_API_KEY não configurada" ao montar o anúncio com IA | Segredo de projeto não copiado para o projeto de teste (ver `docs/AMBIENTES.md`, "Recadastrar os secrets") | A função responde com mensagem em linguagem clara (e código 503) dizendo o que falta e que dá para preencher à mão. O segredo precisa ser cadastrado em *Project Settings → Edge Functions → Secrets* do projeto de teste. |
+| Botão MarketYE do cabeçalho pouco visível | — | Botão na cor laranja da paleta (`--brand-orange`). |
+
 ## O que NÃO entrou (de propósito)
 
 - **Pagamento intra-plataforma, split, escrow, take rate, NF da taxa** —

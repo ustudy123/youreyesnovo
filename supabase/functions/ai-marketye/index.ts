@@ -143,7 +143,12 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
     const apiKey = Deno.env.get("OPENAI_API_KEY");
-    if (!apiKey) throw new Error("OPENAI_API_KEY não configurada");
+    if (!apiKey) {
+      // Segredo do projeto (Project Settings > Edge Functions > Secrets), não
+      // copiado entre ambientes. Sem ele a IA não roda, mas a tela segue útil:
+      // a mensagem diz o que falta e que dá para preencher à mão.
+      return json({ error: "A IA não está configurada neste ambiente (falta o segredo OPENAI_API_KEY nas Edge Functions do projeto). Dá para preencher o anúncio à mão no passo 2." }, 503);
+    }
     const body = await req.json();
     const tipo = body?.tipo as Tipo;
     const dados = (body?.dados ?? {}) as Record<string, unknown>;

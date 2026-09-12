@@ -9,6 +9,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useMarketYEModeracao } from "@/hooks/useMarketYE";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { BUCKET_DOCS, caminhoNoBucket } from "@/lib/marketyeAnexos";
 
 interface Pendente {
   id: string; nome_completo: string; email: string; telefone: string | null; cpf_cnpj: string | null; tipo_pessoa: string; foto_url: string | null; bio: string | null;
@@ -31,6 +34,23 @@ export function ModeracaoPanel({ ativo }: { ativo: boolean }) {
   const [rejeitando, setRejeitando] = useState(false);
   const pendentes = (fila.data ?? []) as Pendente[];
   const listaSuspensos = (suspensos.data ?? []) as Pendente[];
+
+  // Os documentos ficam num bucket PRIVADO: a URL "pública" guardada nas
+  // primeiras versões não abre. O link é assinado na hora, por dois minutos.
+  // A janela abre antes da chamada (dentro do clique) para o navegador não
+  // bloquear como pop-up.
+  const abrirDocumento = async (d: Pendente["documentos"][number]) => {
+    const janela = window.open("about:blank", "_blank");
+    try {
+      const caminho = caminhoNoBucket(d.arquivo_url, BUCKET_DOCS);
+      const { data, error } = await supabase.storage.from(BUCKET_DOCS).createSignedUrl(caminho, 120);
+      if (error || !data?.signedUrl) throw new Error(error?.message ?? "sem link");
+      if (janela) janela.location.href = data.signedUrl; else window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      janela?.close();
+      toast.error(`Não foi possível abrir ${d.nome_arquivo}: ${e instanceof Error ? e.message : "erro"}`);
+    }
+  };
 
   const Lista = ({ itens, vazio }: { itens: Pendente[]; vazio: string }) => (
     itens.length === 0 ? <p className="text-sm text-muted-foreground py-6 text-center">{vazio}</p> : (
@@ -100,7 +120,7 @@ export function ModeracaoPanel({ ativo }: { ativo: boolean }) {
                   {sel.documentos.length === 0 ? <p className="text-xs text-muted-foreground">Nenhum documento enviado.</p> : (
                     <ul className="space-y-1">
                       {sel.documentos.map((d) => (
-                        <li key={d.id} className="flex items-center gap-2 text-xs"><FileText className="h-3.5 w-3.5" /><span className="text-muted-foreground">{categoriaLabels[d.categoria] ?? d.categoria}:</span><a className="underline" href={d.arquivo_url} target="_blank" rel="noreferrer">{d.nome_arquivo}</a></li>
+                        <li key={d.id} className="flex items-center gap-2 text-xs"><FileText className="h-3.5 w-3.5" /><span className="text-muted-foreground">{categoriaLabels[d.categoria] ?? d.categoria}:</span><button type="button" className="underline text-left" onClick={() => void abrirDocumento(d)} data-testid="admin-marketye-documento">{d.nome_arquivo}</button></li>
                       ))}
                     </ul>
                   )}
