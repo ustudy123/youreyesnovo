@@ -52,9 +52,14 @@ não só SST/RH.
 
 **Mobiliário do ambiente de teste.** O "Especialista Staging (QA)" (2 anúncios
 publicados) é semeado ou reparado a cada corrida da esteira pela função
-`marketye_semear_ilha_teste()` (migration 20260912000100), chamada pelo passo que
-semeia a conta-robô; o diagnóstico aparece na resposta do seed, no log. A
-migration 20260911223000 (semente silenciosa) fica como estava.
+`marketye_semear_ilha_teste()` (migrations 20260912000100 e 20260912001000), chamada
+pelo passo que semeia a conta-robô (esse passo só roda com o segredo
+`QA_E2E_TOKEN` configurado no repositório; sem ele, a esteira pula a semeadura e a
+guarda de cobertura). A função escolhe o primeiro CPF fictício livre da faixa da casa
+e informa o resultado. Para ver o diagnóstico no SQL Editor do projeto de teste:
+`SELECT public.marketye_semear_ilha_teste();`. A vitrine passou a mostrar o erro
+da busca ("Não conseguimos buscar agora" + Tentar de novo) em vez de "sem
+resultados". A migration 20260911223000 (semente silenciosa) fica como estava.
 
 **QA.** Casos MKY-001 a MKY-014 (api, com rotinas) e MKY-020 a MKY-022 (e2e,
 `cypress/e2e/marketye.cy.ts`); módulo `rede-parceiros` renomeado para MarketYE

@@ -53,7 +53,7 @@ export default function Marketplace() {
   const [interpretando, setInterpretando] = useState(false);
   const [avisoPedido, setAvisoPedido] = useState(false);
 
-  const { data: resultado, isLoading, isFetching } = useMarketYEBusca(filtros, activeTab === "vitrine");
+  const { data: resultado, isLoading, isFetching, isError: buscaFalhou, error: buscaErro, refetch: buscarDeNovo } = useMarketYEBusca(filtros, activeTab === "vitrine");
   const resultados = resultado?.resultados ?? [];
 
   // Busca vazia/rala vira sinal de demanda latente (RN-023 / 6.3).
@@ -196,6 +196,13 @@ export default function Marketplace() {
 
           {isLoading ? (
             <div className="text-center py-12 text-muted-foreground text-sm">Buscando especialistas...</div>
+          ) : buscaFalhou ? (
+            // Erro de busca não pode parecer "não tem ninguém": mostra o motivo e deixa tentar de novo.
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center space-y-2" data-testid="marketye-erro">
+              <p className="font-medium text-amber-900">Não conseguimos buscar agora.</p>
+              <p className="text-xs text-amber-800 break-words">{buscaErro instanceof Error ? buscaErro.message : String((buscaErro as { message?: string })?.message ?? buscaErro ?? "")}</p>
+              <Button variant="outline" size="sm" onClick={() => buscarDeNovo()}>Tentar de novo</Button>
+            </div>
           ) : resultados.length === 0 ? (
             <div className="rounded-2xl border border-dashed p-8 text-center space-y-3" data-testid="marketye-vazio">
               <Store className="h-12 w-12 mx-auto text-muted-foreground/30" />
