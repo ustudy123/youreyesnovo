@@ -5,8 +5,10 @@
 // Cada it() corresponde a um caso documentado (qa_casos_teste, nível e2e)
 // ligado pela ponte qa_cobertura_e2e: MKY-020, MKY-021, MKY-022.
 // MKY-020/021 entram com a conta-robô da empresa de teste; MKY-022 é público.
-// O mobiliário da ilha de teste ("Especialista Staging (QA)") é semeado pela
-// migration 20260911223000 só onde existe a Empresa Staging LTDA.
+// O mobiliário da ilha de teste ("Especialista Staging (QA)", 2 anúncios
+// publicados) é semeado/reparado a cada corrida pela função do banco
+// marketye_semear_ilha_teste(), chamada pelo passo "Semear a conta-robô"
+// (seed-e2e-user); o diagnóstico sai na resposta do seed, no log da esteira.
 // =====================================================================
 
 import { credenciaisDeTeste } from "../support/credenciais";

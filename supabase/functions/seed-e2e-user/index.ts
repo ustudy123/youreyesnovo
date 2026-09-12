@@ -577,11 +577,27 @@ serve(async (req) => {
       console.error("Robô-parceiro (nao-fatal):", (e as Error).message);
     }
 
+    // 8) Mobiliário do MarketYE ("Especialista Staging (QA)" com 2 anúncios
+    //    publicados): o teste de tela MKY-021 precisa de ao menos um anúncio
+    //    em Segurança do Trabalho. A função do banco semeia ou repara e
+    //    devolve um diagnóstico; ele vai na resposta para aparecer no log da
+    //    esteira (a migration que semeava engolia o erro). NÃO-FATAL.
+    let marketye: unknown = null;
+    try {
+      const { data: mky, error: mkyErr } = await admin.rpc("marketye_semear_ilha_teste");
+      marketye = mkyErr ? { ok: false, erro: mkyErr.message } : mky;
+      console.log("MarketYE (mobiliário):", JSON.stringify(marketye));
+    } catch (e) {
+      marketye = { ok: false, erro: (e as Error).message };
+      console.error("MarketYE (mobiliário, nao-fatal):", (e as Error).message);
+    }
+
     return json({
       ok: true,
       email,
       user_id: userId,
       tenant_id: TENANT_ID,
+      marketye,
       mensagem: "Conta-robô pronta para a suíte Cypress entrar.",
     });
   } catch (erro) {

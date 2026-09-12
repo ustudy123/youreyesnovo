@@ -50,6 +50,12 @@ parâmetros, contestação, liquidez, sanção, pipeline): virou "conversa",
 "ocorrência". A IA (`ai-marketye`) atende qualquer serviço prestado a empresas,
 não só SST/RH.
 
+**Mobiliário do ambiente de teste.** O "Especialista Staging (QA)" (2 anúncios
+publicados) é semeado ou reparado a cada corrida da esteira pela função
+`marketye_semear_ilha_teste()` (migration 20260912000100), chamada pelo passo que
+semeia a conta-robô; o diagnóstico aparece na resposta do seed, no log. A
+migration 20260911223000 (semente silenciosa) fica como estava.
+
 **QA.** Casos MKY-001 a MKY-014 (api, com rotinas) e MKY-020 a MKY-022 (e2e,
 `cypress/e2e/marketye.cy.ts`); módulo `rede-parceiros` renomeado para MarketYE
 na Documentação de testes. Casos PARC-001/002/004/024 atualizados.
