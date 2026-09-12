@@ -18,6 +18,7 @@ const PerfilParceiro = lazy(() => import("./pages/parceiro/PerfilParceiro"));
 const ContratoParceria = lazy(() => import("./pages/parceiros/ContratoParceria"));
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SuperAdminRoute } from "@/components/admin/SuperAdminRoute";
+import { SuperAdminLayout } from "@/components/admin/superadmin/SuperAdminLayout";
 import { Loader2 } from "lucide-react";
 
 // Eager imports for all protected app pages (no loading delay on navigation)
@@ -226,17 +227,23 @@ const App = () => (
               <Route path="/termos-de-uso" element={<TermosDeUso />} />
               <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
 
-              {/* Super Admin Routes */}
-              <Route path="/admin" element={<SuperAdminRoute><SuperAdminDashboard /></SuperAdminRoute>} />
-              <Route path="/admin/tenants/:id" element={<SuperAdminRoute><TenantDetalhe /></SuperAdminRoute>} />
-              <Route path="/admin/tenants/:id/assinatura" element={<SuperAdminRoute><TenantAssinatura /></SuperAdminRoute>} />
-              <Route path="/admin/manual" element={<SuperAdminRoute><ManualSistema /></SuperAdminRoute>} />
-              <Route path="/admin/qa" element={<SuperAdminRoute><QADashboard /></SuperAdminRoute>} />
-              <Route path="/admin/qa/docs" element={<SuperAdminRoute><QADocs /></SuperAdminRoute>} />
-              <Route path="/admin/qa/runner" element={<SuperAdminRoute><QARunner /></SuperAdminRoute>} />
-              <Route path="/admin/youreyes" element={<SuperAdminRoute><YourEyesDashboard /></SuperAdminRoute>} />
-              <Route path="/admin/blog" element={<SuperAdminRoute><BlogAdmin /></SuperAdminRoute>} />
-              <Route path="/admin/contratos" element={<SuperAdminRoute><ContratosAceite /></SuperAdminRoute>} />
+              {/* Super Admin — todas as rotas abrem dentro da casca com o menu
+                  lateral agrupado por área (SuperAdminLayout). /admin e
+                  /admin/:secao são as seções do painel; as demais são páginas
+                  com componente próprio que ganharam o mesmo menu. */}
+              <Route element={<SuperAdminRoute><SuperAdminLayout /></SuperAdminRoute>}>
+                <Route path="/admin" element={<SuperAdminDashboard />} />
+                <Route path="/admin/tenants/:id" element={<TenantDetalhe />} />
+                <Route path="/admin/tenants/:id/assinatura" element={<TenantAssinatura />} />
+                <Route path="/admin/manual" element={<ManualSistema />} />
+                <Route path="/admin/qa" element={<QADashboard />} />
+                <Route path="/admin/qa/docs" element={<QADocs />} />
+                <Route path="/admin/qa/runner" element={<QARunner />} />
+                <Route path="/admin/youreyes" element={<YourEyesDashboard />} />
+                <Route path="/admin/blog" element={<BlogAdmin />} />
+                <Route path="/admin/contratos" element={<ContratosAceite />} />
+                <Route path="/admin/:secao" element={<SuperAdminDashboard />} />
+              </Route>
 
               {/* Protected Onboarding Route */}
               <Route path="/onboarding" element={<ProtectedRoute><OnboardingProtegido /></ProtectedRoute>} />
