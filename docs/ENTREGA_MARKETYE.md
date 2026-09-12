@@ -11,7 +11,7 @@ fora de propósito e como conferir no ambiente de teste.
 acesso e painel de QA passam a dizer **MarketYE**. "Parceiros" fica só para o
 Programa de Parceiros (canal de vendas).
 
-**Banco (migrations 20260911220000 / 221000 / 222000 / 224000 / 230000; script de entrega
+**Banco (migrations 20260911220000 / 221000 / 222000 / 224000 / 230000 / 20260912002000; script de entrega
 `docs/script_marketye_fundacao.sql`).**
 
 | Requisito | Como ficou |
@@ -32,6 +32,7 @@ Programa de Parceiros (canal de vendas).
 | Léxico (RN-028) | Ocorrência, reflexo na visibilidade, ajuste de nível. Auditado pela rotina MKY-007. |
 | Taxonomia (7.1) | Categorias com slug, árvore, aliases, obrigação legal, exige registro, jurisdição. 20 subcategorias do beachhead SST/RH. |
 | Áreas abertas a todo tipo de prestador (decisão 11/09) | Raízes genéricas **Manutenção e instalações**, **Palestras e eventos**, **Consultoria e gestão**, **Saúde e bem-estar** e **Outros serviços**, com sinônimos para a busca em linguagem natural. Nas telas só aparecem as **áreas gerais** (as subáreas continuam no banco, para o encaixe com as obrigações legais e para a IA); a área é sugestão, nunca obrigação. |
+| Busca não quebra ao relaxar filtros (regressão 12/09) | `marketye_buscar` falhava com "malformed array literal" ao anotar a etapa relaxada (lista || 'uf' lido pelo banco como duas listas); acontecia sempre que a empresa tinha estado cadastrado e a busca achava menos de 3 anúncios. Corrigido com `array_append` (migration 20260912002000); caso MKY-015 força as cinco etapas. |
 | Portal abre depois do cadastro mínimo (regressão 11/09) | `marketye_meu_portal` quebrava quando o cadastro não tinha especialidades (nulo medido como lista) e a tela ficava no círculo de carregamento. Função corrigida (migration 230000), tela com "Tentar de novo" e caso MKY-014 cobrindo. |
 | Localização (0.3) | `pais`/`moeda`/`jurisdicao` em especialista, anúncio, categorias e config. Nada de Brasil fixado em código; i18n ainda não. |
 
@@ -61,7 +62,7 @@ e informa o resultado. Para ver o diagnóstico no SQL Editor do projeto de teste
 da busca ("Não conseguimos buscar agora" + Tentar de novo) em vez de "sem
 resultados". A migration 20260911223000 (semente silenciosa) fica como estava.
 
-**QA.** Casos MKY-001 a MKY-014 (api, com rotinas) e MKY-020 a MKY-022 (e2e,
+**QA.** Casos MKY-001 a MKY-015 (api, com rotinas) e MKY-020 a MKY-022 (e2e,
 `cypress/e2e/marketye.cy.ts`); módulo `rede-parceiros` renomeado para MarketYE
 na Documentação de testes. Casos PARC-001/002/004/024 atualizados.
 
