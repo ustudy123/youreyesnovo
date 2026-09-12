@@ -8,24 +8,39 @@ arte) — ninguém precisa repetir cores/tom/posicionamento a cada pedido.
 > (o projeto nasceu como Seguramente e foi renomeado) — **não usar em peças novas**.
 > A produção ainda roda em `seguramente.lovable.app`, mas a comunicação é YourEyes.
 
+> **Referência viva:** o feed real **@youreyes.oficial** é a fonte de estilo
+> (voz + arte). Em dúvida, olhar o feed.
+
 ## Essência
-- **Assinatura:** *Da norma à evidência.*
+- **Assinatura/campanha:** *Enxergue o que sua gestão ainda não vê.*
+- **O que é:** *inteligência organizacional aplicada à gestão preventiva* — uma
+  plataforma que conecta **Pessoas · Saúde · Segurança · Gestão** num só lugar.
+- **Ideia central do conteúdo:** do **dado** ao **contexto** — um dado pode estar
+  certo, mas sem contexto leva à conclusão errada; a YourEyes ajuda a enxergar o
+  *porquê*, não só o *quê*.
 - **Posicionamento (amplo):** a plataforma que deixa a empresa mais madura —
   governança contínua do trabalho humano (RH, DP, SST, jornada, folha,
   documentos, cultura, metas), da norma à evidência. **NR-1/psicossocial é porta
   de entrada, nunca o teto. Nunca estreitar à NR-1.**
-- **Público:** decisores de RH/DP/SST em pequenas e médias empresas. **Mercado
-  frio** — ainda não conhecem a YourEyes; tom de apresentação e prova de valor,
-  nunca de continuidade.
+- **Público:** decisores de RH/DP/SST em pequenas e médias empresas.
 
 ## Mascote
-- **Íris** — uma **robô** assistente, simpática e competente. O nome remete à
-  íris do olho (**YourEyes** = visão, clareza).
+- **Íris** — uma **robô branca e azul**, simpática e competente. O nome remete à
+  íris do olho (**YourEyes** = visão, clareza). Já aparece no feed.
 - **Uso:** boa em redes sociais e materiais leves; em peças institucionais é
-  opcional. Não forçar a presença dela.
-- **Ativo:** para a Íris aparecer nas artes do Canva, o desenho dela precisa
-  estar disponível como asset no Canva (Brand Kit ou upload). *(pendente: subir
-  o arquivo da Íris ao Brand Kit YourEyes.)*
+  opcional. Não forçar.
+
+## Estilo de conteúdo (o feed é a referência)
+- **Formato-assinatura:** carrossel narrativo — abre com um **dado isolado** que
+  induz a conclusão apressada → hipóteses → falta de **contexto** → a YourEyes
+  ajuda a enxergar o porquê (ex.: *"Ele chegou atrasado 4 vezes"*).
+- **Arte:** fundo navy/azul em degradê, foto cinematográfica de trabalho **ou**
+  mockup do sistema; título branco encorpado com palavras-chave em **azul/laranja**;
+  laranja como destaque/carimbo de tensão.
+- **A arte final de qualidade sai do processo de vocês (designer/templates), não
+  do gerador de IA "do zero"** — que não atinge esse nível. Papel dos agentes:
+  **copy + roteiro de carrossel + briefing de arte** e preencher os **templates**
+  (autofill).
 
 ## Cores
 | Papel | Hex |
