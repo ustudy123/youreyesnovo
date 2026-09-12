@@ -128,7 +128,7 @@ export default function Marketplace() {
 
       {isSuperAdmin && (
         <div className="mb-3 text-xs text-muted-foreground flex items-center gap-2" data-testid="marketye-aviso-admin">
-          <Shield className="h-3.5 w-3.5" />Aqui você vê o MarketYE como uma empresa cliente. A administração (aprovar cadastros, denúncias, ajustes) fica em <Link to="/admin?aba=marketye" className="underline underline-offset-2 font-medium">Super Admin → MarketYE</Link>.
+          <Shield className="h-3.5 w-3.5" />Aqui você vê o MarketYE como uma empresa cliente. A administração (aprovar cadastros, denúncias, ajustes) fica em <Link to="/admin/marketye" className="underline underline-offset-2 font-medium">Super Admin → MarketYE</Link>.
         </div>
       )}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
