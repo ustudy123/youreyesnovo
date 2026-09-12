@@ -62,6 +62,13 @@ e informa o resultado. Para ver o diagnóstico no SQL Editor do projeto de teste
 da busca ("Não conseguimos buscar agora" + Tentar de novo) em vez de "sem
 resultados". A migration 20260911223000 (semente silenciosa) fica como estava.
 
+**Pacote de QA (12/09).** `docs/QA_MARKETYE.md` traz a auditoria do requisito,
+a análise de risco, os defeitos encontrados, a matriz CA × caso e a recomendação
+go/no-go do agente de QA. Os casos MKY-030 a MKY-161 (13 famílias) estão na
+Documentação de Testes (migration 20260912020000; script
+`docs/script_marketye_qa_documentacao.sql`) e ganham rotinas e testes de tela nas
+ondas seguintes — até lá o motor mostra "não implementado", nunca "passou".
+
 **QA.** Casos MKY-001 a MKY-015 (api, com rotinas) e MKY-020 a MKY-022 (e2e,
 `cypress/e2e/marketye.cy.ts`); módulo `rede-parceiros` renomeado para MarketYE
 na Documentação de testes. Casos PARC-001/002/004/024 atualizados.
