@@ -61,8 +61,9 @@ Sem exagero. **Nunca prometer conformidade ou resultado automático.**
 
 ## Como isto é reutilizado (para nunca repetir)
 1. **Canva Brand Kit "YourEyes"** = o visual (cores, fontes, logo, Íris). Toda
-   arte gerada com esse Brand Kit já sai on-brand. *(a montar no Canva; ver
-   AMBIENTES/estas notas — precisa do `brand_kit_id`.)*
+   arte gerada com esse Brand Kit já sai on-brand. **`brand_kit_id = kAHU8P-jQu4`**
+   (URL: https://www.canva.com/brand/kAHU8P-jQu4). É o padrão embutido no botão
+   "Gerar no Canva" da Central de Comando GTM.
 2. **Este guia** = o resto (nome, tom, público, pilares, do/don't). Injetado
    automaticamente pela Central de Comando GTM (constante `BRAND_PROMPT`) e pelos
    subagentes em `.claude/agents/`.
