@@ -17,7 +17,7 @@ import { useFolhaCalculo } from "@/hooks/useFolhaCalculo";
 import { useColaboradores } from "@/hooks/useColaboradores";
 import { toast } from "sonner";
 import {
-  useFeriasMediaVariaveis, descreverMedia, type MediaVariaveis,
+  useFeriasMediaVariaveis, descreverMedia, type MediaVariaveis, type MediaCompetencia,
 } from "@/hooks/useFeriasMediaVariaveis";
 import { FeriasEsocialEventos } from "@/components/ferias/FeriasEsocialEventos";
 

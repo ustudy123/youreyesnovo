@@ -7,6 +7,7 @@ import { toast } from "sonner";
 export interface FeriasSolicitacao {
   id: string;
   tenant_id: string;
+  empresa_id?: string | null;
   colaborador_id: string | null;
   colaborador_nome: string;
   colaborador_cpf: string | null;
