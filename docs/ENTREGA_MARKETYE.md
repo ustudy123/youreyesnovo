@@ -69,7 +69,15 @@ Documentação de Testes (migration 20260912020000; script
 `docs/script_marketye_qa_documentacao.sql`) e ganham rotinas e testes de tela nas
 ondas seguintes — até lá o motor mostra "não implementado", nunca "passou".
 
-**QA.** Casos MKY-001 a MKY-015 (api, com rotinas) e MKY-020 a MKY-022 (e2e,
+**Segurança (12/09, rotinas MKY-110..116).** A família de segurança ganhou rotina (migration
+20260912030000) e, na primeira execução, achou e corrigiu: D-05 (funções executáveis por
+visitante), D-15 (aviso de nível legível por qualquer usuário), D-16 (visitante com SELECT
+em avaliações) e **D-17: 13 políticas (5 no Storage) liam `user_id` do especialista, coluna
+fechada desde a fundação, e quebravam qualquer leitura direta de anúncios/pacotes/contratações
+e o upload de foto/documento do especialista com "permission denied"**. Reescritas com
+`marketye_meu_id()`.
+
+**QA.** Casos MKY-001 a MKY-015 e MKY-110 a MKY-116 (api, com rotinas) e MKY-020 a MKY-022 (e2e,
 `cypress/e2e/marketye.cy.ts`); módulo `rede-parceiros` renomeado para MarketYE
 na Documentação de testes. Casos PARC-001/002/004/024 atualizados.
 
