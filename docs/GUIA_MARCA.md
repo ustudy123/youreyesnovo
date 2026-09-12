@@ -87,17 +87,35 @@ Sem exagero. **Nunca prometer conformidade ou resultado automático.**
 A arte no padrão do feed NÃO vem do gerador de IA "do zero" — vem de **preencher
 um layout desenhado por vocês**. Método validado (09/2026):
 
-1. **Molde** = um post real da YourEyes no Canva (ex.: design `DAHVA4RxENo`,
-   página 1 — "APAREÇA pra quem está PROCURANDO", com Íris + mockup + navy).
-2. Para gerar uma peça: **copiar** o molde (`copy-design`, só a página do post) →
-   **trocar os textos** (`edit-design` `replace_text`) → **exportar** (`export-design` PNG).
-   O layout, a Íris, o mockup e as cores ficam intactos; só o texto muda.
-3. **Campos do molde "manchete"** (ids de elemento estáveis entre cópias):
-   - `LBgRTN2nQDQH9CvX` — gancho (linha branca de cima; ex.: "Decisões no escuro?")
-   - `LB63FGmKFsrypyf2` — destaque 1 (palavra grande azul; ex.: "ENXERGUE")
-   - `LBRYlX7cfhbyKlwY` — linha 2 (branca; ex.: "o que sua gestão")
-   - `LBhbnGL1GGXXWFlQ` — destaque 2 (grande azul; ex.: "ainda não vê")
-   (o `locator_id` real é `<page_id>-<esses ids>`; leia a cópia com `read-design`
-   para obter o `page_id` antes do `replace_text`.)
-4. Conforme forem surgindo mais posts-modelo (carrossel narrativo, etc.), registrar
-   cada molde aqui com seu id e seus campos.
+1. **Molde** = um post real da YourEyes no Canva: design `DAHVA4RxENo`, página 1.
+   **Versão atual do molde (09/2026):** manchete alinhada à ESQUERDA, **Íris à
+   direita** com o mockup do sistema, e no rodapé o **logo YourEyes + a tagline
+   "INTELIGÊNCIA QUE PROTEGE. VISÃO QUE ANTECIPA."** (fundo navy em degradê).
+   > **Atenção:** o molde é editado ao vivo pela dona — o layout e os ids **mudam
+   > quando ela mexe nele**. Já houve uma versão anterior (texto centralizado, Íris
+   > à esquerda, sem logo/tagline, ids `LBgRTN2nQDQH9CvX / LB63FGmKFsrypyf2 /
+   > LBRYlX7cfhbyKlwY / LBhbnGL1GGXXWFlQ`). **Sempre ler a cópia com `read-design`
+   > para conferir os ids reais antes de trocar texto** — não confiar de cabeça.
+2. Para gerar uma peça: **copiar** o molde (`copy-design`, só a página 1) →
+   **ler a cópia** (`read-design open_transaction:true`) p/ pegar `page_id` e ids →
+   **trocar os textos** (`edit-design` `replace_text`) → **commit** → **exportar**
+   (`export-design` PNG). O layout, a Íris, o mockup, o logo e as cores ficam
+   intactos; só o texto muda.
+3. **Campos de manchete — versão atual do molde:**
+   - `LBprgcHFYDgZpPgY` — gancho (linha branca de cima; ex.: "Cumpriu a norma?")
+   - `LBpTmLDL9QyHycq3` — destaque 1 (palavra grande azul; ex.: "PROVE")
+   - `LBh7CNbmW8v7LNQf` — linha 2 (branca; ex.: "cada ato com")
+   - `LBWn0k2kBW9v3VN2` — destaque 2 (grande azul; ex.: "EVIDÊNCIA")
+   (o `locator_id` real é `<page_id>-<esses ids>`; o `page_id` muda a cada cópia.)
+   Limites de texto: destaque 1 cabe ~8 caracteres numa linha; destaque 2 quebra
+   em 2 linhas se passar de ~11. Gancho e linha 2 são as linhas brancas menores.
+4. **Tagline no molde × assinatura do guia — reconciliar.** O molde usa
+   "Inteligência que protege. Visão que antecipa."; a Essência deste guia usa
+   "Enxergue o que sua gestão ainda não vê." São duas linhas diferentes; decidir
+   qual é a oficial (ou o papel de cada uma) com a dona.
+5. **Posts já gerados por este método (09/2026):**
+   - `DAHVBaOHlhY` — "Um dado isolado ENGANA sem o CONTEXTO" (do dado ao contexto)
+   - `DAHVBJuPNfk` — "Cumpriu a norma? PROVE cada ato com EVIDÊNCIA" (norma→evidência)
+   - `DAHVBAxKTYg` — "Dados em silos? UNIFIQUE RH, DP e SST num só lugar" (integração)
+6. Conforme surgirem mais posts-modelo (carrossel narrativo, etc.), registrar cada
+   molde aqui com seu id e seus campos.
